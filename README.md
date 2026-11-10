@@ -12,6 +12,7 @@ This repo is installed by every team member. Target repos, where tasks are imple
 | `config/user.example.yaml` | Template for per-user configuration. | §5 |
 | `config/user.yaml` | Your own per-user configuration (git-ignored; created by you). | §5 |
 | `harness/DEFAULT_HARNESS.md` | Default harness, applied when a target repo has none. | E4, AC14 |
+| `skills/slack/SKILL.md` | Slack skill: one thread per task, transition notices, mentions, reading replies. | §12, UC1, AC44 |
 
 ## Setup (each team member)
 
