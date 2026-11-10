@@ -81,7 +81,8 @@ Skills recognize their own Asana comments by a fixed first line. Each marker is 
 | First line | Written by | Meaning |
 |---|---|---|
 | `Side hustle Slack thread: <permalink>` | Owner agent (Slack skill) | The task's Slack thread. |
-| `Side hustle claim: <user> · <n>% · <ISO week>` | Picker agent (pick-up skill) | `<user>` claims the task. `<n>` is the task's Budget, in % of the weekly Claude usage limit, reserved from `<user>`'s pledge for that week. Only the earliest claim comment since the task last entered Open or Next wins; later ones have lost and are deleted by their author. |
+| `Side hustle claim: <user> · <n>% · <ISO week>` | Picker agent (pick-up skill) | `<user>` claims the task. `<n>` is the task's Budget, in % of the weekly Claude usage limit, reserved from `<user>`'s pledge for that week. Only the earliest claim comment in the current round wins (the round starts when the task last entered Open or Next, or at its latest `Side hustle claim void:`); later ones have lost and are deleted by their author. |
+| `Side hustle claim void: <user>` | Any polling agent (pick-up skill) | `<user>`'s winning claim did not reach Doing within `heartbeat_timeout_hours`. It is void and no longer counts as pledge used, and a new claim round starts. |
 | `Side hustle released: <reason>` | The releasing agent (pick-up skill) | The task was released to Next: voluntary, pledge used up, or orphaned. |
 | `Side hustle state:` | Picker agent or any releasing agent | Documented state: branch, last commit, draft or proposed tasks, what is left. |
 | `Side hustle review: PASS` or `Side hustle review: FAIL` | Reviewer agent (reviewer skill) | The review result and report (SPEC.md UC4, AC23). |

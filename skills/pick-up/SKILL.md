@@ -34,10 +34,17 @@ This step runs even when side hustle mode is off or B has no pledge left (AC53).
 4. Otherwise release it as described in "Release a task", with reason `orphaned`.
    - Document only the last durable state you can see: the latest `Side hustle state:` comment, plus the pushed branch, its last commit, or the draft.
    - Never touch another agent's workspace.
+5. **Abandoned claims.** Also look at every task in Open or Next whose current round has a winning claim older than `heartbeat_timeout_hours`. Such a claim never reached Doing, because its claimant stopped part-way.
+   - Read the task again.
+   - If it is still in Open or Next and the claim is still the winning one, add the comment `Side hustle claim void: <claimant>`.
+   - If the task is assigned to that claimant, remove the assignee. Never remove anyone else.
+
+   The void comment starts a new claim round, so the task becomes claimable again. The voided claim no longer counts as pledge used.
 
 ### 2. Keep B's work going (work already underway)
 
-For each task assigned to B:
+For each task assigned to B, and each task in Open or Next where B holds the winning claim:
+- **Pending claim:** B's winning claim is not void, and the task is still in Open or Next. Finish the claim idempotently with step 5 of "To claim": assign the task to B if it is unassigned or already assigned to B, set the heartbeat, move it to Doing and post the notice.
 - **In Doing**, if this session is not already working on it: implement it (step 4). If it was released before, resume from the documented state (AC43).
 - **In To Review**, when the latest `Side hustle review:` comment after the task last entered To Review is `PASS`: deliver it (step 5).
 - **Anything else**, such as To Review still waiting for a review, or QA Review or Needs Info: nothing to do, move on.
@@ -54,7 +61,7 @@ Skip this step unless **both** are true:
 
 Compute the pledge figures for the current ISO week:
 - **Pledge used** (SPEC.md §5), in percentage points of the weekly limit:
-  - **Until usage reporting exists:** the sum of the `<n>` in B's **winning** claim markers for this ISO week (see "To claim"). These are the budgets B claimed this week.
+  - **Until usage reporting exists:** the sum of the `<n>` in B's **winning**, non-void claim markers for this ISO week (see "To claim"). These are the budgets B claimed this week.
   - **Once usage reporting exists:** B's actual consumption on side hustle tasks this week, as published by the usage reporting skill. That skill defines the source; this skill only reads it. Reviews are attributed as the spec says: they are inside the task's budget and never charged to the reviewer's pledge.
 - **Pledge left:** `pledge_percent` minus pledge used.
 - **Active claims:** B's tasks in Doing or To Review. Stop claiming once their number reaches `max_concurrency` (AC4).
@@ -74,7 +81,7 @@ Look at tasks in **Open** and **Next** (Next is claimable like Open, AC12). A ta
 **To claim an eligible task (AC3, AC10, AC11)**, without asking anyone for confirmation. All agents arbitrate with the same rule, using Asana alone.
 
 **Claim round and winning claim:**
-- A task's **claim round** starts when it last entered Open or Next, from its section history.
+- A task's **claim round** starts at the later of two moments: when the task last entered Open or Next (from its section history), and its latest `Side hustle claim void:` comment.
 - The **winning claim** is the earliest `Side hustle claim:` comment created in the current round.
 - Any later claim comment in the round has lost. It does not count as pledge used and gives no right to the task.
 - **Never overwrite an existing assignee.**
@@ -87,13 +94,14 @@ Steps:
    - delete your own claim comment;
    - skip the task with no other comment and no Slack post (E1);
    - reserve nothing, start no work, and keep looking.
-5. **If the winning claim is B's**, and the task is still unassigned and in Open or Next:
+5. **If the winning claim is B's**, and the task is still unassigned (or already assigned to B) and in Open or Next:
    - assign the task to B;
    - set `Last heartbeat` to now;
+   - read the task's comments again; if a `Side hustle claim void:` now covers your claim, stop: the claim is lost (step 4);
    - move it to Doing;
    - post the claim notice (Slack skill).
 
-   If by then it has an assignee, treat it as lost (step 4).
+   If by then it has another assignee, treat it as lost (step 4).
 6. Recompute pledge left and active claims before the next candidate.
 
 Claiming your own task is allowed (E15).
