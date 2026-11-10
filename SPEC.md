@@ -32,7 +32,7 @@ A **dashboard** shows team usage (tokens, models, tasks published, picked up and
 | Actor | Description |
 |---|---|
 | **Owner (User A)** | Overloaded person who publishes the task. Has the context, reviews in QA Review and marks Done. |
-| **Owner agent** | A's agent. Fills in missing information on A's tasks that are in Needs Info. |
+| **Owner agent** | A's agent. Fills in missing information on A's tasks that are in Needs Info, and clears the "stalled" flag once A has completed it. |
 | **Picker (User B)** | Person with spare token capacity who turns on side hustle mode. |
 | **Picker agent** | B's agent. Polls, claims, implements and delivers. |
 | **Reviewer agent** | Independent agent (context separate from the implementer) that checks the deliverable against the task. |
@@ -147,7 +147,7 @@ While delivering, the picker agent updates the heartbeat. There is never a deplo
 A reviews. If A approves, a human does the merge, final publication or deploy, and A marks Done. If A rejects, A comments in Asana on how to proceed and moves the task to Next. Any agent (including B's) can pick it up afterwards.
 
 ### UC7: Fill in information (owner agent)
-A's agent polls A's tasks in Needs Info. It fills in what is missing **in Asana** (from its own context or by asking A on Slack, asynchronously) and moves the task back to Open. If nobody answers within the Needs Info timeout, a single reminder is sent to the owner. If the reminder also gets no answer, the task is flagged "stalled" on the dashboard, A's agent (or A) releases it to Next with no assignee, and Slack is notified. While flagged, it cannot be claimed; when the owner provides the missing information in Asana, the flag is cleared and the task becomes eligible again.
+A's agent polls A's tasks in Needs Info. It fills in what is missing **in Asana** (from its own context or by asking A on Slack, asynchronously) and moves the task back to Open. If nobody answers within the Needs Info timeout, a single reminder is sent to the owner. If the reminder also gets no answer, the task is flagged "stalled" on the dashboard, A's agent (or A) releases it to Next with no assignee, and Slack is notified. While flagged, it cannot be claimed; once the owner has completed the missing information in Asana, A's agent clears the flag and the task becomes eligible again.
 
 ### UC8: Release a task
 B (or B's agent) can release a task at any time from Doing, To Review, QA Review or Needs Info; Done is final and cannot be released. Releasing a task in Open or Next is a no-op: nothing changes and no notification is sent. On a release, the state the task was in is documented in Asana (branch, last commit, what is left), the task moves to Next with no assignee, and Slack is notified.
@@ -170,7 +170,7 @@ The whole team sees the metrics, with names (section 11).
 | E9 | The reviewer finds a non-destructive failure | Back to Doing with the report, up to the max attempts; then Needs Info. |
 | E10 | The reviewer finds a destructive failure | Straight to Needs Info, no retries. |
 | E11 | The owner rejects | Next with an Asana comment; unassigned, and anyone can pick it up. |
-| E12 | The owner does not answer in Needs Info | Single reminder, then flagged "stalled" on the dashboard and released to Next by the owner agent or the owner (unassigned, Slack notified). It cannot be claimed until the owner provides the missing information in Asana, which clears the flag. |
+| E12 | The owner does not answer in Needs Info | Single reminder, then flagged "stalled" on the dashboard and released to Next by the owner agent or the owner (unassigned, Slack notified). It cannot be claimed until the owner has completed the missing information in Asana and the owner agent clears the flag. |
 | E13 | Information arrives only via Slack | It does not count as an instruction until it is in Asana; the owner agent copies it over. |
 | E14 | The agent resuming a task has no prior context | It continues using only what is in Asana (description, comments and documented state). |
 | E15 | The owner tries to pick up their own task | Allowed. No restriction. |
@@ -199,7 +199,7 @@ The side hustle harness (these skills, the default harness and the shared config
 - **Pick up tasks:** polling, eligibility filters, claiming, heartbeat and releasing.
 - **Slack:** post in each task's thread, mention people and listen for replies.
 - **Reviewer:** the four checks in UC4.
-- **Fill in information:** poll own tasks in Needs Info and update them in Asana.
+- **Fill in information:** poll own tasks in Needs Info and update them in Asana; clear the "stalled" flag once the information is complete.
 - **Usage reporting:** publish metrics to the dashboard.
 
 ## 13. Pain points addressed
@@ -286,7 +286,7 @@ The side hustle harness (these skills, the default harness and the shared config
 ### Needs Info and owner agent
 - **AC36:** GIVEN one of A's tasks is in Needs Info, WHEN A's agent polls, THEN it fills in what is missing in Asana (or asks A on Slack asynchronously, leaving the task in Needs Info) and moves it to Open once the information is in Asana.
 - **AC37:** GIVEN a task in Needs Info with no answer when the timeout expires, WHEN the deadline passes, THEN a single reminder is sent to the owner.
-- **AC38:** GIVEN the reminder also gets no answer, WHEN the deadline passes again, THEN the task is flagged "stalled" on the dashboard, the owner agent (or the owner) moves it to Next with no assignee, and Slack is notified; it cannot be claimed until the owner provides the missing information in Asana, which clears the flag.
+- **AC38:** GIVEN the reminder also gets no answer, WHEN the deadline passes again, THEN the task is flagged "stalled" on the dashboard, the owner agent (or the owner) moves it to Next with no assignee, and Slack is notified; it cannot be claimed until the owner has completed the missing information in Asana and the owner agent clears the flag.
 - **AC39:** GIVEN the owner answers only on Slack, WHEN the owner agent detects it, THEN it copies the answer into Asana before moving the task back to Open.
 - **AC40:** GIVEN an agent is waiting on anything, WHEN it waits, THEN it keeps working on other tasks and does not block.
 
