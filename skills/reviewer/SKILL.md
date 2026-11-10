@@ -25,7 +25,9 @@ Look at tasks in **To Review**. R may review any of them, including a task R imp
 
 The **review window** of a task starts when it last entered To Review. The **authoritative result** is the **first** `Side hustle review:` comment in the window. Any later result in the same window is void: it never moves the task and is never delivered on. The pick-up skill uses the same rule.
 
-For each task in To Review:
+First, in any section: if a task has a `Side hustle notice pending:` comment written by a reviewer, with no matching `Side hustle notice sent:` after it, the move was done but its Slack notice was not. Post that notice now (Slack skill), then add `Side hustle notice sent: <same transition>`. Never repeat the move.
+
+Then, for each task in To Review:
 - **The window has an authoritative FAIL, and the task is still in To Review:** its outcome was not applied, for example because its reviewer stopped. Apply it now (step 5, "Apply the outcome"), whoever wrote it. Do not review again.
 - **The window has an authoritative PASS:** skip the task; the picker delivers it.
 - **A review is in progress:** a `Side hustle review started: <reviewer>` comment younger than `heartbeat_timeout_hours` exists in the window, so skip the task. The task's `Last heartbeat` cannot tell this, since the picker also refreshes it while the task waits. An older start marker is abandoned, and the task can be reviewed again.
@@ -101,6 +103,13 @@ After posting, read the task again:
 **Apply the outcome** (also used in step 1 for an outcome left unapplied).
 1. Read the task again first, and go on only if it is still in To Review with the same assignee.
 2. The step is idempotent: the move and its notice happen once, from the authoritative result's outcome line.
+3. For a move:
+   1. add `Side hustle notice pending: <From> → <To> · <reason>`;
+   2. move the task;
+   3. post the notice (Slack skill);
+   4. add `Side hustle notice sent: <From> → <To> · <reason>`.
+
+   If you stop part-way, a later cycle posts the pending notice (step 1). This is the same "pending notice" convention the Slack skill uses.
 
 | Result | Outcome | Then |
 |---|---|---|

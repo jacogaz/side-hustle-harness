@@ -82,6 +82,7 @@ Skills recognize their own Asana comments by a fixed first line. Each marker is 
 |---|---|---|
 | `Side hustle Slack thread: <permalink>` | Owner agent (Slack skill) | The task's Slack thread. |
 | `Side hustle claim: <user> · <n>% · <ISO week>` | Picker agent (pick-up skill) | Claim record, written only after `<user>` is confirmed as the assignee. `<n>` is the task's Budget, in % of the weekly Claude usage limit, reserved from `<user>`'s pledge for that week. The assignee is the lock; this record is only for pledge accounting. |
+| `Side hustle notice pending: <From> → <To> · <reason>` / `Side hustle notice sent: <same>` | Reviewer agent (reviewer skill) | A section move whose Slack notice may still be missing. A pending notice with no matching `sent` after it is posted by the next reviewer cycle. |
 | `Side hustle released: <reason>` | The releasing agent (pick-up skill) | The task was released to Next: voluntary, pledge used up, or orphaned. |
 | `Side hustle state:` | Picker agent or any releasing agent | Documented state: branch, last commit, draft or proposed tasks, what is left. |
 | `Side hustle review started: <user>` | Reviewer agent (reviewer skill) | `<user>` is reviewing the task. Other reviewers skip the task while this comment is younger than `heartbeat_timeout_hours`. |
