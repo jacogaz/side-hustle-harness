@@ -56,7 +56,7 @@ A **dashboard** shows team usage (tokens, models, tasks published, picked up and
 | Max reviewer attempts | Number of Doing ↔ To Review loops before moving to Needs Info. |
 | Heartbeat timeout | Hours without a heartbeat after which a task in Doing or To Review is considered orphaned. |
 | Needs Info timeout | Hours without an answer before a single reminder to the owner; if the reminder also gets no answer within it, the task is flagged "stalled" and released to Next. |
-| Default budget per size | Default tokens for S/M/L that the create-task skill can use when the owner gives no budget. |
+| Default budget per size | Default tokens for S/M/L that the create-task skill applies when the owner gives an estimate but no budget. |
 | Default harness | Minimal shared guidelines applied when the repo defines no harness. |
 | Slack channel | Shared side hustle channel. |
 
@@ -72,8 +72,8 @@ A **dashboard** shows team usage (tokens, models, tasks published, picked up and
 | Context / links | No | Specs, MRs, threads. |
 | Priority | No | High / Medium / Low. |
 | Estimate | No | S / M / L. |
-| Token budget | Yes | If the owner gives none, the create-task skill determines it when publishing. |
-| Last heartbeat | System | Updated by the agent working on the task (the picker agent in Doing, the reviewer agent in To Review). |
+| Token budget | Yes | If the owner gives none, the create-task skill sets it when publishing: the default for the estimate, or, with no estimate either, a budget it determines. |
+| Last heartbeat | System | Updated by the agent currently working on the task while it is in Doing or To Review (the picker agent implementing or delivering, the reviewer agent reviewing). There is no heartbeat once the task is in QA Review; it starts again if the task returns to Doing. |
 
 ## 8. Lifecycle (Asana sections)
 
@@ -83,7 +83,7 @@ A **dashboard** shows team usage (tokens, models, tasks published, picked up and
 | **Doing** | An agent is implementing; assigned to it | No |
 | **To Review** | The reviewer agent is checking | No |
 | **QA Review** | The owner is reviewing the deliverable | No |
-| **Next** | The owner rejected it and left a comment in Asana on how to proceed, or it was released with its state documented | Yes |
+| **Next** | The owner rejected it and left a comment in Asana on how to proceed, or it was released with its state documented | Yes, unless flagged "stalled" |
 | **Needs Info** | Information is missing or a decision is needed; waiting for the owner agent or the owner | No |
 | **Done** | Approved by the owner | No |
 
@@ -116,6 +116,7 @@ A (or A's agent, using the create-task skill) creates the task in the **Side Hus
 ### UC2: Poll and claim
 With side hustle mode on and consumption below the threshold, B's agent looks for tasks in Open or Next that meet **all** of the following:
 - they are unassigned;
+- they are not flagged "stalled";
 - all required fields are filled in;
 - their budget fits within the margin B has left before the threshold;
 - B has not reached max concurrency.
@@ -140,16 +141,16 @@ Once the reviewer passes all checks, the picker agent delivers, depending on the
 - **Documentation:** published in Confluence as a draft or in a review space.
 - **Asana tasks:** created in the target project.
 
-There is never a deploy. The task moves to QA Review and the Slack agent notifies the owner in the thread with a summary and links.
+While delivering, the picker agent updates the heartbeat. There is never a deploy. The task moves to QA Review and the Slack agent notifies the owner in the thread with a summary and links.
 
 ### UC6: Owner review
 A reviews. If A approves, a human does the merge, final publication or deploy, and A marks Done. If A rejects, A comments in Asana on how to proceed and moves the task to Next. Any agent (including B's) can pick it up afterwards.
 
 ### UC7: Fill in information (owner agent)
-A's agent polls A's tasks in Needs Info. It fills in what is missing **in Asana** (from its own context or by asking A on Slack, asynchronously) and moves the task back to Open. If nobody answers within the Needs Info timeout, a single reminder is sent to the owner. If the reminder also gets no answer, the task is flagged "stalled" on the dashboard, released to Next with no assignee, and Slack is notified.
+A's agent polls A's tasks in Needs Info. It fills in what is missing **in Asana** (from its own context or by asking A on Slack, asynchronously) and moves the task back to Open. If nobody answers within the Needs Info timeout, a single reminder is sent to the owner. If the reminder also gets no answer, the task is flagged "stalled" on the dashboard, released to Next with no assignee, and Slack is notified. While flagged, it cannot be claimed; when the owner provides the missing information in Asana, the flag is cleared and the task becomes eligible again.
 
 ### UC8: Release a task
-B (or B's agent) can release a task at any time, in any section (including QA Review and Needs Info). The state it was in is documented in Asana (branch, last commit, what is left), the task moves to Next with no assignee, and Slack is notified.
+B (or B's agent) can release a task at any time, in any section except Done, which is final (including QA Review and Needs Info; a task in Open or Next is already unassigned). The state it was in is documented in Asana (branch, last commit, what is left), the task moves to Next with no assignee, and Slack is notified.
 
 ### UC9: View the dashboard
 The whole team sees the metrics, with names (section 11).
@@ -169,11 +170,11 @@ The whole team sees the metrics, with names (section 11).
 | E9 | The reviewer finds a non-destructive failure | Back to Doing with the report, up to the max attempts; then Needs Info. |
 | E10 | The reviewer finds a destructive failure | Straight to Needs Info, no retries. |
 | E11 | The owner rejects | Next with an Asana comment; unassigned, and anyone can pick it up. |
-| E12 | The owner does not answer in Needs Info | Single reminder, then flagged "stalled" on the dashboard and released to Next (unassigned, Slack notified). |
+| E12 | The owner does not answer in Needs Info | Single reminder, then flagged "stalled" on the dashboard and released to Next (unassigned, Slack notified). It cannot be claimed until the owner provides the missing information in Asana, which clears the flag. |
 | E13 | Information arrives only via Slack | It does not count as an instruction until it is in Asana; the owner agent copies it over. |
 | E14 | The agent resuming a task has no prior context | It continues using only what is in Asana (description, comments and documented state). |
 | E15 | The owner tries to pick up their own task | Allowed. No restriction. |
-| E16 | B wants to abandon a task | B releases it to Next at any time. |
+| E16 | B wants to abandon a task | B releases it to Next at any time, unless it is in Done. |
 | E17 | Someone other than the owner moves a task to Done | Not valid: only the owner marks Done. |
 
 ## 11. Dashboard
@@ -224,7 +225,7 @@ The side hustle harness (these skills, the default harness and the shared config
 
 ## 15. Assumptions
 
-- The budget is set by the owner; if missing, the create-task skill determines it when publishing, so every published task has a budget.
+- The budget is set by the owner; if missing, the create-task skill sets it when publishing (the default for the estimate, or a budget it determines when there is no estimate), so every published task has a budget.
 - Documentation is published as a draft or in a review space until the owner approves it.
 - All communication about a task goes to its thread in the side hustle channel.
 - The reviewer has no access to the implementer's reasoning; it only sees the task and the deliverable.
@@ -239,7 +240,7 @@ The side hustle harness (these skills, the default harness and the shared config
 - **AC3:** GIVEN B has the mode on and consumption below the threshold, WHEN there is an unassigned task in Open with all required fields filled in and a budget that fits B's margin, THEN B's agent claims it without asking for confirmation.
 - **AC4:** GIVEN B has reached max concurrency, WHEN there are eligible tasks, THEN B's agent claims no more.
 - **AC5:** GIVEN a task's budget exceeds the margin B has left before the threshold, WHEN the agent evaluates it, THEN it does not claim it and keeps looking.
-- **AC6:** GIVEN the owner gives no budget, WHEN the create-task skill publishes the task, THEN it determines the budget and the task is created with it.
+- **AC6:** GIVEN the owner gives no budget, WHEN the create-task skill publishes the task, THEN it uses the default budget for the estimate, or determines a budget if there is no estimate either, and the task is created with it.
 - **AC7:** GIVEN B changes their window, threshold, concurrency or threshold policy, WHEN the next poll cycle runs, THEN the new configuration applies.
 
 ### Publish
@@ -249,7 +250,7 @@ The side hustle harness (these skills, the default harness and the shared config
 ### Claim
 - **AC10:** GIVEN an agent claims a task, WHEN it does so, THEN the task is assigned to B, moves to Doing, and the Slack thread is notified.
 - **AC11:** GIVEN two agents try to claim the same task, WHEN the first one becomes assignee, THEN the second discards it without commenting and keeps looking.
-- **AC12:** GIVEN an unassigned task in Next, WHEN any eligible agent polls, THEN it can claim it just like a task in Open.
+- **AC12:** GIVEN an unassigned task in Next that is not flagged "stalled", WHEN any eligible agent polls, THEN it can claim it just like a task in Open.
 
 ### Implement
 - **AC13:** GIVEN the target repo defines a harness, WHEN the agent implements, THEN it follows the repo's rules even if they contradict B's personal configuration.
@@ -285,12 +286,12 @@ The side hustle harness (these skills, the default harness and the shared config
 ### Needs Info and owner agent
 - **AC36:** GIVEN one of A's tasks is in Needs Info, WHEN A's agent polls, THEN it fills in what is missing in Asana (or asks A on Slack asynchronously, leaving the task in Needs Info) and moves it to Open once the information is in Asana.
 - **AC37:** GIVEN a task in Needs Info with no answer when the timeout expires, WHEN the deadline passes, THEN a single reminder is sent to the owner.
-- **AC38:** GIVEN the reminder also gets no answer, WHEN the deadline passes again, THEN the task is flagged "stalled" on the dashboard, moves to Next with no assignee, and Slack is notified.
+- **AC38:** GIVEN the reminder also gets no answer, WHEN the deadline passes again, THEN the task is flagged "stalled" on the dashboard, moves to Next with no assignee, and Slack is notified; it cannot be claimed until the owner provides the missing information in Asana, which clears the flag.
 - **AC39:** GIVEN the owner answers only on Slack, WHEN the owner agent detects it, THEN it copies the answer into Asana before moving the task back to Open.
 - **AC40:** GIVEN an agent is waiting on anything, WHEN it waits, THEN it keeps working on other tasks and does not block.
 
 ### Release and orphaned tasks
-- **AC41:** GIVEN B or B's agent releases a task, WHEN they do so, THEN the state is documented in Asana, the task moves to Next with no assignee, and Slack is notified.
+- **AC41:** GIVEN B or B's agent releases a task that is not in Done, WHEN they do so, THEN the state is documented in Asana, the task moves to Next with no assignee, and Slack is notified.
 - **AC42:** GIVEN a task in Doing or To Review with no heartbeat for the timeout period, WHEN another agent polls, THEN it releases it to Next with the last known state and notifies Slack.
 - **AC43:** GIVEN an agent resumes a released task, WHEN it starts, THEN it continues from the documented state (existing branch or draft), not from scratch.
 
