@@ -35,6 +35,12 @@ asana_project:
   gid: "1220379119011503"
   sections:
     open: "1220379100159455"
+    doing: "1220379121415094"
+    to_review: "1220379100149619"
+    qa_review: "1220378651843995"
+    next: "1220379121354363"
+    needs_info: "1220379034141540"
+    done: "1220378955636623"
   # Custom fields holding Priority, Estimate, Budget and Last heartbeat
   # (templates/task-description.md). Budget is stored as a fraction: 0.05 = 5%.
   custom_fields:

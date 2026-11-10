@@ -14,6 +14,7 @@ This repo is installed by every team member. Target repos, where tasks are imple
 | `harness/DEFAULT_HARNESS.md` | Default harness, applied when a target repo has none. | E4, AC14 |
 | `skills/slack/SKILL.md` | Slack skill: one thread per task, transition notices, mentions, reading replies. | §12, UC1, AC44 |
 | `skills/create-task/SKILL.md` | Create-task skill: publishes a task with the full template, a budget and a Slack thread. | §12, UC1, AC6, AC8 |
+| `skills/pick-up/SKILL.md` | Pick-up skill: one cycle step that recovers orphaned tasks, claims, implements, delivers after review and releases. | §12, UC2, UC3, UC5, UC8 |
 | `templates/task-description.md` | Asana task template: the description format and custom fields every skill writes and reads. | §7 |
 
 ## Setup (each team member)
@@ -46,7 +47,7 @@ This repo is installed by every team member. Target repos, where tasks are imple
 | `default_budget_per_size` | Default budget for `S` / `M` / `L` estimates, as % of the weekly usage limit, when the owner gives no budget. |
 | `default_harness` | Path to the default harness file. |
 | `slack_channel` | Name and id of the shared side hustle channel. |
-| `asana_project` | Gids of the Side Hustle Asana project, its sections (Open) and its custom fields (Priority, Estimate, Budget, Last heartbeat) with their options. |
+| `asana_project` | Gids of the Side Hustle Asana project, its sections (all seven) and its custom fields (Priority, Estimate, Budget, Last heartbeat) with their options. |
 
 Global values change only through a commit to this repo. Values marked `confirmed default` are the defaults confirmed by the owner.
 

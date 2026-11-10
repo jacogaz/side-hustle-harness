@@ -73,3 +73,16 @@ The option gids for Priority and Estimate are in `config/global.yaml`.
   - **The agent currently working on the task**, but only the `Last heartbeat` custom field. Its exact update rules belong to the skill that works on the task.
 
   No other agent edits the description or the custom fields.
+
+## Comment markers (for every skill)
+
+Skills recognize their own Asana comments by a fixed first line. Each marker is written only by the skill named here; any skill may read it.
+
+| First line | Written by | Meaning |
+|---|---|---|
+| `Side hustle Slack thread: <permalink>` | Owner agent (Slack skill) | The task's Slack thread. |
+| `Side hustle claim: <user> · <n>% · <ISO week>` | Picker agent (pick-up skill) | Claim record, written only after `<user>` is confirmed as the assignee. `<n>` is the task's Budget, in % of the weekly Claude usage limit, reserved from `<user>`'s pledge for that week. The assignee is the lock; this record is only for pledge accounting. |
+| `Side hustle released: <reason>` | The releasing agent (pick-up skill) | The task was released to Next: voluntary, pledge used up, or orphaned. |
+| `Side hustle state:` | Picker agent or any releasing agent | Documented state: branch, last commit, draft or proposed tasks, what is left. |
+| `Side hustle review: PASS` or `Side hustle review: FAIL` | Reviewer agent (reviewer skill) | The review result and report (SPEC.md UC4, AC23). |
+| `Side hustle stalled` / `Side hustle stalled cleared` | Owner agent (fill-in skill) | The "stalled" flag. A task is flagged while its latest of these two comments is `Side hustle stalled`. |
