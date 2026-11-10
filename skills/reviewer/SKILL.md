@@ -23,9 +23,13 @@ Re-read both config files every cycle. **Gate:**
 
 Look at tasks in **To Review**. R may review any of them, including a task R implemented (E21), as long as the review runs in an independent context (step 3).
 
-The **review window** of a task starts when it last entered To Review. Skip the task if, in this window, either:
-- a `Side hustle review:` result already exists, because the review is done;
-- or a `Side hustle review started: <reviewer>` comment younger than `heartbeat_timeout_hours` exists, because another review is in progress. The task's `Last heartbeat` cannot tell this, since the picker also refreshes it while the task waits. An older start marker is abandoned, and the task can be reviewed again.
+The **review window** of a task starts when it last entered To Review. The **authoritative result** is the **first** `Side hustle review:` comment in the window. Any later result in the same window is void: it never moves the task and is never delivered on. The pick-up skill uses the same rule.
+
+For each task in To Review:
+- **The window has an authoritative FAIL, and the task is still in To Review:** its outcome was not applied, for example because its reviewer stopped. Apply it now (step 5, "Apply the outcome"), whoever wrote it. Do not review again.
+- **The window has an authoritative PASS:** skip the task; the picker delivers it.
+- **A review is in progress:** a `Side hustle review started: <reviewer>` comment younger than `heartbeat_timeout_hours` exists in the window, so skip the task. The task's `Last heartbeat` cannot tell this, since the picker also refreshes it while the task waits. An older start marker is abandoned, and the task can be reviewed again.
+- **Otherwise**, the task can be reviewed.
 
 To take a task:
 1. Read it again.
@@ -36,12 +40,12 @@ Review one task at a time.
 
 ## 2. Keep the review valid (lock check)
 
-Before each important step (starting the checks, posting the result, moving the task), read the task again. Abandon the review silently, with no comment and no Slack post, when any of these is true:
+Before starting the checks and before posting the result, read the task again. Abandon the review silently, with no comment and no Slack post, when any of these is true:
 - the task is no longer in To Review;
 - its assignee changed;
-- a `Side hustle review:` result now exists in this review window.
+- an authoritative result now exists in this review window.
 
-Only the **first** result in a review window counts. While reviewing, set `Last heartbeat` at least every `poll_interval_minutes`, so the task is not treated as orphaned (pick-up step 1, AC16).
+Your own result, once it is authoritative, is never a reason to abandon. You still apply its outcome (step 5). While reviewing, set `Last heartbeat` at least every `poll_interval_minutes`, so the task is not treated as orphaned (pick-up step 1, AC16).
 
 ## 3. Review in an independent context (AC22)
 
@@ -65,12 +69,14 @@ For code, check out the branch in a clean workspace of your own, and never push 
 
 1. **Compliance:** every acceptance criterion is met. List each criterion with pass or fail and the evidence.
 2. **Scope:** nothing listed under "Out of scope / do not touch" was changed, and there are no changes unrelated to the task.
-3. **Non-destructive:** the deliverable does none of these, unless the task explicitly requested the removal of files, tests or functionality:
+3. **Non-destructive:** the deliverable does none of these:
    - no data deletion;
    - no irreversible migration;
    - no force-push;
    - no permission or secret change;
-   - no removal of files, tests or functionality.
+   - no removal of files, tests or functionality that the task did not explicitly request.
+
+   The first four have no exception. A requested removal never excuses any of them.
 4. **Harness:** the **effective harness** passes: the target repo's harness (tests, lint, conventions) when it has one, otherwise `default_harness`. If the default harness applies, the deliverable must say so (AC14).
 
 **Failure classes:**
@@ -86,9 +92,15 @@ Do the lock check (step 2) first. Then add **one** Asana comment. Its first line
 
 **Counting attempts:**
 - `<max>` is `max_reviewer_attempts`.
-- The returns to Doing used so far are the `Outcome: retry` reports since the task's latest `Side hustle claim:` record. A new claimer starts with fresh attempts.
+- The returns to Doing used so far are all the authoritative `Outcome: retry` results of the task, across every claim. The count never resets on a new claim (SPEC.md §6).
 
-Then apply the outcome that matches the result:
+After posting, read the task again:
+- **Your result is not the authoritative one** (an earlier result exists in the window): do nothing more. That result's outcome applies.
+- **Your result is authoritative:** apply its outcome.
+
+**Apply the outcome** (also used in step 1 for an outcome left unapplied).
+1. Read the task again first, and go on only if it is still in To Review with the same assignee.
+2. The step is idempotent: the move and its notice happen once, from the authoritative result's outcome line.
 
 | Result | Outcome | Then |
 |---|---|---|

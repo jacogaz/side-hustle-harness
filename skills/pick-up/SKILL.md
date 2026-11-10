@@ -57,7 +57,7 @@ For each task assigned to B:
 - **In Doing**, if this session is not already working on it: implement it (step 4). If it was released before, resume from the documented state (AC43).
 - **In To Review:**
   - set `Last heartbeat` to now every cycle while the task waits, either for a reviewer or for delivery after a PASS. A task in To Review is then orphaned only when B's session is gone; the reviewer also updates the heartbeat while it is actively reviewing;
-  - when the latest `Side hustle review:` comment after the task last entered To Review is `PASS`, deliver it (step 5).
+  - when the **authoritative** review result is `PASS`, deliver it (step 5). That result is the first `Side hustle review:` comment after the task last entered To Review; later ones are void. Read the task again just before delivering to confirm this.
 - **Anything else**, such as QA Review or Needs Info: nothing to do, move on.
 
 **Pledge used up mid-task (E5, AC19, AC20)** applies only once usage reporting measures actual usage. Until then, a claimed task's budget is reserved for the whole task, so work underway is never stopped for pledge reasons. Once actual usage is measured, a task whose usage exhausts B's pledge is handled per `on_pledge_used_up`:
