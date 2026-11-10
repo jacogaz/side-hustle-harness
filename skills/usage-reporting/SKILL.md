@@ -24,11 +24,17 @@ The segment ends when the next one starts, or when the step ends. Work that touc
 ## 1. Measure each segment
 
 **Tokens (measured).**
-- **Source:** the current session's Claude Code transcript (`~/.claude/projects/<project>/<session id>.jsonl`). Each assistant message there records its `model` and token `usage`.
-- **Count per segment:** for each `(task, phase, model)`, sum `input_tokens + output_tokens + cache_creation_input_tokens + cache_read_input_tokens` over the messages whose timestamps fall in the segment.
-- **If the transcript cannot be read:** estimate tokens as the characters of the segment's prompts and replies ÷ 4, and mark the line `tokens: estimate`.
+- **Sources:** the current session's Claude Code transcript (`~/.claude/projects/<project>/<session id>.jsonl`), plus the transcripts of any **subagents** the cycle started, which Claude Code stores separately for that session. That includes the reviewer's independent context. Each assistant record carries its `model`, its token `usage`, and a response id (`message.id`).
+- **Count each response once:** one response can appear as several records, for example one per content or tool block. Group the records by `message.id` and take that response's usage once, from its last (completed) record.
+- **Attribute it:**
+  - a main-session response belongs to the segment its timestamp falls in;
+  - a subagent's responses all belong to the segment that started that subagent, for example the reviewer's `review` segment.
 
-**Cost (estimate).** Tokens × the model's rate in `config/global.yaml` `usage.price_usd_per_mtok`, in USD. Models without a rate report `cost: n/a`. A subscription is not billed per token, so the cost is an API-equivalent figure for comparison only.
+  Only numbers are read, never the subagent's content, so no implementer reasoning reaches the reviewer and no review content leaves it.
+- **Count per segment:** for each `(task, phase, model)`, sum `input_tokens + output_tokens + cache_creation_input_tokens + cache_read_input_tokens` over those responses.
+- **If a transcript cannot be read**, the session's or a subagent's: estimate that part as its characters ÷ 4 and mark the line `tokens: estimate`. If not even that is possible, mark it `tokens: unavailable`. Never report missing usage as a measured zero.
+
+**Cost (estimate).** `cost_usd = tokens / 1,000,000 × price_usd_per_mtok[model]`, with the rate from `config/global.yaml` `usage.price_usd_per_mtok`. Models without a rate report `cost: n/a`. A subscription is not billed per token, so the cost is an API-equivalent figure for comparison only.
 
 **% of the weekly limit (estimate).** Claude Code does not expose the weekly limit as a number, so this is `100 × tokens / usage.weekly_limit_tokens_estimate`.
 
@@ -38,7 +44,7 @@ On each task worked on in this cycle, add **one** comment, with one line per `(p
 
 ```
 Side hustle usage: <B> · <ISO week> · <cycle start time>
-<phase> · <model> · <tokens> tokens (<measured|estimate>) · ~$<cost> · ~<pct>% of weekly limit (estimate)
+<phase> · <model> · <tokens> tokens (<measured|estimate|unavailable>) · ~$<cost> · ~<pct>% of weekly limit (estimate)
 ```
 
 Before posting, read the task's comments. Never post twice for the same cycle start time, so the report is idempotent.
