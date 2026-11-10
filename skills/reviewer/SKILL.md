@@ -25,7 +25,7 @@ Look at tasks in **To Review**. R may review any of them, including a task R imp
 
 The **review window** of a task starts when it last entered To Review. Skip the task if, in this window, either:
 - a `Side hustle review:` result already exists, because the review is done;
-- or a `Side hustle review started: <reviewer>` comment exists whose reviewer's last heartbeat is younger than `heartbeat_timeout_hours`, because another review is in progress. The reviewer's last heartbeat is the task's `Last heartbeat`.
+- or a `Side hustle review started: <reviewer>` comment younger than `heartbeat_timeout_hours` exists, because another review is in progress. The task's `Last heartbeat` cannot tell this, since the picker also refreshes it while the task waits. An older start marker is abandoned, and the task can be reviewed again.
 
 To take a task:
 1. Read it again.

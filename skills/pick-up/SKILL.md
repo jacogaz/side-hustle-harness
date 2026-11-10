@@ -55,8 +55,10 @@ For each task assigned to B:
 - **Claim record repair (first):** if the current assignment to B, from the task's history, has no `Side hustle claim:` record by B written after it, add one now, once. Use the ISO week of that assignment, not the current week. This way a crash can never leave a claimed task out of pledge accounting.
 - **Pending claim:** the task is still in Open or Next. Finish the claim idempotently with steps 3–4 of "To claim". The claim record was already repaired above, so do not write a second one.
 - **In Doing**, if this session is not already working on it: implement it (step 4). If it was released before, resume from the documented state (AC43).
-- **In To Review**, when the latest `Side hustle review:` comment after the task last entered To Review is `PASS`: deliver it (step 5).
-- **Anything else**, such as To Review still waiting for a review, or QA Review or Needs Info: nothing to do, move on.
+- **In To Review:**
+  - set `Last heartbeat` to now every cycle while the task waits, either for a reviewer or for delivery after a PASS. A task in To Review is then orphaned only when B's session is gone; the reviewer also updates the heartbeat while it is actively reviewing;
+  - when the latest `Side hustle review:` comment after the task last entered To Review is `PASS`, deliver it (step 5).
+- **Anything else**, such as QA Review or Needs Info: nothing to do, move on.
 
 **Pledge used up mid-task (E5, AC19, AC20)** applies only once usage reporting measures actual usage. Until then, a claimed task's budget is reserved for the whole task, so work underway is never stopped for pledge reasons. Once actual usage is measured, a task whose usage exhausts B's pledge is handled per `on_pledge_used_up`:
 - `finish`: complete it and claim nothing more;
