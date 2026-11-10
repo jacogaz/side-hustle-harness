@@ -41,7 +41,7 @@ Only **the task owner's agent** creates a task's thread, so there is a single cr
    ```
    [Side hustle] <task name>
    <Asana task URL>
-   Owner: @<owner> · Estimate: <S/M/L or none> · Budget: <tokens>
+   Owner: @<owner> · Estimate: <S/M/L or none> · Budget: <% of weekly limit>
    ```
 3. Add the Asana comment `Side hustle Slack thread: <permalink of that message>` to the task.
 
@@ -64,7 +64,7 @@ Add what each case requires:
 | → To Review | The implementation is finished and review has started. |
 | To Review → Doing | The reviewer's report is in Asana; attempt `<n>` of `max_reviewer_attempts`. |
 | To Review → QA Review (AC31) | Mention the owner, `@<owner>`. Include a short summary of the deliverable and the links: MR, Confluence page, or the created Asana tasks. Also link the task. |
-| → Next, release (AC20, AC41, AC42, E6) | Why it was released (voluntary, threshold `release` policy, or orphaned). Include a link to the Asana comment that documents the state. The task is now unassigned and open to anyone. |
+| → Next, release (AC20, AC41, AC42, E6) | Why it was released (voluntary, pledge used up with the `release` policy, or orphaned). Include a link to the Asana comment that documents the state. The task is now unassigned and open to anyone. |
 | Needs Info → Next, stalled (AC38) | Mention the owner, `@<owner>`. The task is flagged "stalled" and cannot be claimed until the owner completes the information in Asana. |
 | Needs Info → Open | The information is complete in Asana and the task is ready to be picked up. |
 | QA Review → Next / Done (AC35, AC33) | Rejected: the owner's Asana comment explains how to proceed. Approved: Done. |

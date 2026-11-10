@@ -1,27 +1,30 @@
 # Side hustle per-user configuration (SPEC.md section 5).
-# Copy this file to config/user.yaml (git-ignored) and edit your copy.
+# start-side-hustle writes config/user.yaml (git-ignored) itself: it asks only for
+# your weekly pledge and uses the confirmed defaults below for everything else.
+# Until that skill exists, copy this file to config/user.yaml and edit your copy.
 # Skills re-read config/user.yaml at the start of every poll cycle, so a change
 # applies from the next poll cycle with no restart.
 # Values marked "confirmed default" are the defaults confirmed by the owner.
 
-# Opt-in. While false, your agent neither picks up nor reviews tasks; owner agent
-# duties still run. start-side-hustle turns it on (SPEC.md UC10).
+# % of your weekly Claude usage limit given to shared side hustle tasks this
+# week (e.g. 5, 10, 20). 0 = only follow up on your own tasks (owner duties only).
+pledge_percent: 0
+
+# Week the pledge applies to (ISO week, e.g. 2026-W46). At the start of a new
+# week, start-side-hustle's cycle keeps last week's pledge and updates this.
+pledge_week: ""
+
+# On when pledge_percent is above 0, off at 0. While off, your agent neither
+# picks up nor reviews tasks; owner agent duties still run.
 side_hustle_mode: false
-
-# Window over which your consumption is measured, e.g. "5h" or "weekly".
-usage_window: weekly                # confirmed default
-
-# % of the usage window. Your agent picks up tasks only while consumption is
-# strictly below this value.
-usage_threshold_percent: 80         # confirmed default
 
 # Maximum number of tasks your agent holds claimed at the same time.
 max_concurrency: 1                  # confirmed default
 
-# What to do with the current task when the threshold is crossed mid-task:
+# What to do with the current task when your pledge is used up mid-task:
 #   finish  - complete it and pick up nothing more
 #   release - document the state in Asana, unassign, move to Next, notify Slack
-on_threshold_crossed: finish        # confirmed default
+on_pledge_used_up: finish           # confirmed default
 
 # Minutes between two cycles of your side hustle loop, started once with
 # start-side-hustle (SPEC.md UC10).

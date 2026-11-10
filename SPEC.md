@@ -4,9 +4,9 @@
 
 ## 1. Summary
 
-Some team members run short on tokens, time or focus. Others have Claude tokens left unused in their current window. **Side Hustle** lets the first group publish tasks in Asana, and the **agents** of the second group pick them up, implement them, review them and deliver them **asynchronously and autonomously**. The task **owner** always reviews and approves the final result. Each user, owner or picker, runs **one skill once** (`start-side-hustle`), and from then on the whole flow runs by itself.
+Some team members run short on tokens, time or focus. Others have Claude usage left unused in their weekly limit and pledge a share of it (a % of their weekly Claude usage limit) to shared tasks. **Side Hustle** lets the first group publish tasks in Asana, and the **agents** of the second group pick them up, implement them, review them and deliver them **asynchronously and autonomously**. The task **owner** always reviews and approves the final result. Each user, owner or picker, runs **one skill once** (`start-side-hustle`) and answers one question, how much of their weekly usage to pledge; from then on the whole flow runs by itself.
 
-A **dashboard** shows team usage (tokens, models, tasks published, picked up and completed, leaderboard) and insights for optimizing the workflow.
+A **dashboard** shows team usage (pledges and usage, models, tasks published, picked up and completed, leaderboard) and insights for optimizing the workflow.
 
 ## 2. Goals
 
@@ -32,8 +32,8 @@ A **dashboard** shows team usage (tokens, models, tasks published, picked up and
 | Actor | Description |
 |---|---|
 | **Owner (User A)** | Overloaded person who publishes the task. Has the context, reviews in QA Review and marks Done. Runs `start-side-hustle` once so that A's owner agent runs. |
-| **Owner agent** | A's agent, run by A's side hustle cycle (UC10) whatever A's side hustle mode or threshold. Fills in missing information on A's tasks that are in Needs Info, and clears the "stalled" flag once A has completed it. |
-| **Picker (User B)** | Person with spare token capacity who runs `start-side-hustle` once, which turns on side hustle mode. |
+| **Owner agent** | A's agent, run by A's side hustle cycle (UC10) whatever A's side hustle mode or pledge. Fills in missing information on A's tasks that are in Needs Info, and clears the "stalled" flag once A has completed it. |
+| **Picker (User B)** | Person with spare token capacity who runs `start-side-hustle` once and pledges a share of their weekly usage, which turns on side hustle mode. |
 | **Picker agent** | B's agent. Polls, claims, implements and delivers. |
 | **Reviewer agent** | Independent agent (context separate from the implementer) that checks the deliverable against the task. |
 | **Slack agent** | The agents' ability to post and listen in the side hustle channel. |
@@ -45,12 +45,19 @@ Once a user runs `start-side-hustle`, the recurring cycle in that user's session
 
 | Parameter | Description |
 |---|---|
-| Side hustle mode (on/off) | Opt-in that lets this user's agent pick up and review tasks. `start-side-hustle` turns it on. Owner agent duties run whether it is on or off. |
-| Usage window | Window over which consumption is measured (e.g. weekly or 5h limit). |
-| Usage threshold | % of the window below which the agent may pick up tasks. |
+| Side hustle mode (on/off) | On when the pledge is above 0, off at 0. While on, this user's agent picks up and reviews tasks. Owner agent duties run whether it is on or off. |
+| Pledge | % of the user's weekly Claude usage limit given to shared side hustle tasks this week (e.g. 5, 10, 20). 0 means only following up on the user's own tasks (owner duties only). |
 | Max concurrency | Number of tasks claimed at the same time. |
-| On crossing the threshold mid-task | `finish` or `release`. |
+| On using up the pledge mid-task | `finish` or `release`. |
 | Poll interval | Time between two cycles of the user's side hustle loop (UC10). |
+
+**Pledge used this week:**
+- Until usage reporting exists, it is the sum of the budgets of the tasks the user claimed this week.
+- Once usage reporting exists, it is the user's actual consumption on side hustle tasks this week.
+
+The **pledge left** is the pledge minus the pledge used.
+
+`start-side-hustle` writes this configuration (UC10). It asks only for the pledge, and every other parameter uses its confirmed default.
 
 ## 6. Global configuration (side hustle)
 
@@ -59,7 +66,7 @@ Once a user runs `start-side-hustle`, the recurring cycle in that user's session
 | Max reviewer attempts | Number of Doing ↔ To Review loops before moving to Needs Info. |
 | Heartbeat timeout | Hours without a heartbeat after which a task in Doing or To Review is considered orphaned. |
 | Needs Info timeout | Hours without an answer before a single reminder to the owner; if the reminder also gets no answer within it, the task is flagged "stalled" and released to Next by the owner agent or the owner. |
-| Default budget per size | Default tokens for S/M/L that the create-task skill applies when the owner gives an estimate but no budget. |
+| Default budget per size | Default budget for S/M/L, as % of the weekly usage limit, that the create-task skill applies when the owner gives an estimate but no budget. |
 | Default harness | Minimal shared guidelines applied when the repo defines no harness. |
 | Slack channel | Shared side hustle channel. |
 
@@ -75,7 +82,7 @@ Once a user runs `start-side-hustle`, the recurring cycle in that user's session
 | Context / links | No | Specs, MRs, threads. |
 | Priority | No | High / Medium / Low. |
 | Estimate | No | S / M / L. |
-| Token budget | Yes | If the owner gives none, the create-task skill sets it when publishing: the default for the estimate, or, with no estimate either, a budget it determines. |
+| Budget | Yes | % of the weekly usage limit. If the owner gives none, the create-task skill sets it when publishing: the default for the estimate, or, with no estimate either, a budget it determines. |
 | Last heartbeat | System | Updated by the agent currently working on the task while it is in Doing or To Review (the picker agent implementing or delivering, the reviewer agent reviewing). There is no heartbeat once the task is in QA Review; it starts again if the task returns to Doing. |
 
 ## 8. Lifecycle (Asana sections)
@@ -105,7 +112,7 @@ Once a user runs `start-side-hustle`, the recurring cycle in that user's session
 | QA Review → Done | Owner | Approval (and merge, final publication or deploy done by a human) |
 | Doing → Needs Info | Picker agent | Budget exhausted before reaching To Review, or the task contradicts the repo harness |
 | Doing/To Review/QA Review/Needs Info → Next | Picker / picker agent | Voluntary release |
-| Doing/To Review → Next | Picker agent / any agent | Threshold crossed with `release` policy, or orphaned task |
+| Doing/To Review → Next | Picker agent / any agent | Pledge used up with `release` policy, or orphaned task |
 | Needs Info → Open | Owner agent / owner | Information completed in Asana |
 | Needs Info → Next | Owner agent / owner | Stalled: the single reminder got no answer within the Needs Info timeout |
 
@@ -117,11 +124,11 @@ When a task moves to Open or Next, it is **unassigned**. The assignment is what 
 A (or A's agent, using the create-task skill) creates the task in the **Side Hustle** project with the full template and leaves it in Open. The Slack agent opens a thread for the task in the side hustle channel.
 
 ### UC2: Poll and claim
-With side hustle mode on and consumption below the threshold, B's agent looks for tasks in Open or Next that meet **all** of the following:
+With side hustle mode on and pledge left this week, B's agent looks for tasks in Open or Next that meet **all** of the following:
 - they are unassigned;
 - they are not flagged "stalled";
 - all required fields are filled in;
-- their budget fits within the margin B has left before the threshold;
+- their budget fits in the pledge B has left this week;
 - B has not reached max concurrency.
 
 It claims autonomously (assigns the task to itself, which means to B, and moves it to Doing) and posts in the Slack thread. If two agents claim the same task, the first one to become assignee wins; the other silently discards it and keeps looking.
@@ -159,12 +166,12 @@ B (or B's agent) can release a task at any time from Doing, To Review, QA Review
 The whole team sees the metrics, with names (section 11).
 
 ### UC10: Start side hustle
-B (any user, including owners) runs the `start-side-hustle` skill once. It turns side hustle mode on and starts a recurring cycle in B's open session that repeats every poll interval, with no further human action. In each cycle, for B, it does the duties below. Only new claims and reviewer work require side hustle mode on and B below the threshold. Orphan recovery (E6, AC42) and the owner agent duties always run. Implementing and delivering work already underway, and finishing or releasing it when the threshold is crossed, follow their existing rules:
-- **Picker duties:** check side hustle mode, the threshold and max concurrency; claim eligible tasks (UC2); implement them with the heartbeat (UC3); release orphaned tasks (E6); deliver after the review passes (UC5).
+B (any user, including owners) runs the `start-side-hustle` skill once. It asks B one question: how much of their weekly Claude usage to give to shared Side Hustle tasks this week (a %). It then writes B's per-user configuration itself, with that pledge, the current week and the confirmed defaults for everything else; side hustle mode is on when the pledge is above 0. Finally it starts a recurring cycle in B's open session that repeats every poll interval, with no further human action. In each cycle, for B, it does the duties below. Only new claims and reviewer work require side hustle mode on and pledge left for B this week. Orphan recovery (E6, AC42) and the owner agent duties always run. Implementing and delivering work already underway, and finishing or releasing it when B's pledge is used up, follow their existing rules:
+- **Picker duties:** check side hustle mode, the pledge left and max concurrency; claim eligible tasks (UC2); implement them with the heartbeat (UC3); release orphaned tasks (E6); deliver after the review passes (UC5).
 - **Reviewer duties:** review tasks in To Review (UC4), including tasks B implemented, always with a context independent of the implementer's (AC22).
 - **Owner agent duties for B's own tasks:** handle Needs Info, the reminder and stalled tasks (UC7); open and follow the Slack threads; copy replies into Asana; post the notices for transitions B made by hand.
 
-When B turns side hustle mode off, or crosses the threshold (after finishing or releasing the current task, per B's policy), the cycle stops picking up and reviewing tasks by itself; the owner agent duties keep running. Running `start-side-hustle` again while B's cycle is active does nothing: each user has one active cycle. If B's session closes, B's tasks are recovered by the existing heartbeat timeout (E6).
+When B sets the pledge to 0 (mode off), or B's pledge is used up (after finishing or releasing the current task, per B's policy), the cycle stops picking up and reviewing tasks by itself; the owner agent duties keep running. Running `start-side-hustle` again only updates B's pledge; it never starts a second cycle: each user has one active cycle. At the start of a new week, the cycle keeps last week's pledge % and says so once in B's session, without waiting for an answer. If B's session closes, B's tasks are recovered by the existing heartbeat timeout (E6).
 
 ## 10. Edge cases
 
@@ -174,10 +181,10 @@ When B turns side hustle mode off, or crosses the threshold (after finishing or 
 | E2 | Required fields are missing | Not claimed. What is missing is commented in Asana, A is mentioned in the Slack thread, and the task moves to Needs Info. |
 | E3 | The task contradicts the repo harness (e.g. "skip the tests") | Needs Info; the owner clarifies in Asana. |
 | E4 | The repo has no harness | The default harness is applied and noted in the deliverable. |
-| E5 | B crosses the threshold mid-task | Per B's policy: `finish` completes it and picks up nothing more; `release` documents the state and moves it to Next. |
+| E5 | B's pledge is used up mid-task | Per B's policy: `finish` completes it and picks up nothing more; `release` documents the state and moves it to Next. |
 | E6 | The agent disappears (crash, closed session) | When the heartbeat timeout expires, any polling agent releases it to Next with its state documented and notifies Slack. |
-| E7 | The token budget runs out | The agent stops, documents the state in Asana and moves the task to Needs Info. |
-| E8 | The budget does not fit B's margin | Not claimed; the task is skipped. |
+| E7 | The budget runs out | The agent stops, documents the state in Asana and moves the task to Needs Info. |
+| E8 | The budget does not fit in B's pledge left this week | Not claimed; the task is skipped. |
 | E9 | The reviewer finds a non-destructive failure | Back to Doing with the report, up to the max attempts; then Needs Info. |
 | E10 | The reviewer finds a destructive failure | Straight to Needs Info, no retries. |
 | E11 | The owner rejects | Next with an Asana comment; unassigned, and anyone can pick it up. |
@@ -188,9 +195,10 @@ When B turns side hustle mode off, or crosses the threshold (after finishing or 
 | E16 | B wants to abandon a task | B releases it to Next at any time from Doing, To Review, QA Review or Needs Info; not from Done. In Open or Next, release is a no-op with no notification. |
 | E17 | Someone other than the owner moves a task to Done | Not valid: only the owner marks Done. |
 | E18 | B's session closes while side hustle is running | The cycle stops; B's tasks in Doing or To Review are released by another agent when the heartbeat timeout expires (E6). |
-| E19 | B turns side hustle mode off or crosses the threshold while the cycle runs | The cycle stops picking up and reviewing tasks by itself; with the threshold, the current task is first finished or released per B's policy (E5). Owner agent duties keep running. |
-| E20 | B runs `start-side-hustle` while B's cycle is already active | Nothing happens; each user has one active cycle. |
+| E19 | B sets the pledge to 0 or B's pledge is used up while the cycle runs | The cycle stops picking up and reviewing tasks by itself; when the pledge is used up, the current task is first finished or released per B's policy (E5). Owner agent duties keep running. |
+| E20 | B runs `start-side-hustle` while B's cycle is already active | Only B's pledge is updated; no second cycle starts (each user has one active cycle). |
 | E21 | B's cycle reviews a task B implemented | Allowed, as long as the review runs with a context independent of the implementer's (AC22). |
+| E22 | A new week starts while B's cycle runs | The cycle keeps last week's pledge % for the new week and says so once in B's session, without waiting for an answer. |
 
 ## 11. Dashboard
 
@@ -198,7 +206,7 @@ When B turns side hustle mode off, or crosses the threshold (after finishing or 
 
 | Block | Metrics |
 |---|---|
-| Usage | Tokens and cost per person, per model, per task and per phase (implementation, review, communication); % of window consumed per user. |
+| Usage | Tokens and cost per person, per model, per task and per phase (implementation, review, communication); pledge and pledge used this week per user (% of the weekly limit). |
 | Flow | Tasks per section; average time in each section; total Open → Done time; stalled or orphaned tasks. |
 | Quality | % approved by the owner on the first pass; number of rejections (returns to Next); reviewer failures and their reasons. |
 | People | Leaderboard of who publishes, picks up and completes the most. |
@@ -216,7 +224,7 @@ The side hustle harness (these skills, the default harness and the shared config
 - **Reviewer:** the four checks in UC4.
 - **Fill in information:** poll own tasks in Needs Info and update them in Asana; clear the "stalled" flag once the information is complete.
 - **Usage reporting:** publish metrics to the dashboard.
-- **Start side hustle (`start-side-hustle`):** the single trigger a user runs once; it turns side hustle mode on and starts the recurring cycle that runs the user's picker, reviewer and owner agent duties every poll interval (UC10).
+- **Start side hustle (`start-side-hustle`):** the single trigger a user runs once; it asks for the user's weekly pledge, writes the user's configuration (side hustle mode on when the pledge is above 0) and starts the recurring cycle that runs the user's picker, reviewer and owner agent duties every poll interval (UC10).
 
 ## 13. Pain points addressed
 
@@ -233,7 +241,7 @@ The side hustle harness (these skills, the default harness and the shared config
 2. Production deploys done by agents.
 3. Multiple teams, boards or channels.
 4. Incentives, gamification or compensation beyond the leaderboard.
-5. Auto-tuning of models, budgets or thresholds.
+5. Auto-tuning of models, budgets or pledges.
 6. Handling of secrets or sensitive data inside tasks.
 7. Tools other than GitLab, Asana, Confluence and Slack as task targets or communication channels (GitHub is used only to host the side hustle harness).
 8. Tasks that require synchronous human interaction.
@@ -252,12 +260,12 @@ The side hustle harness (these skills, the default harness and the shared config
 
 ### Configuration and eligibility
 - **AC1:** GIVEN B has side hustle mode off, WHEN a poll cycle runs, THEN B's agent neither looks for nor claims tasks.
-- **AC2:** GIVEN B has the mode on and consumption above the threshold, WHEN a poll cycle runs, THEN B's agent claims no tasks.
-- **AC3:** GIVEN B has the mode on and consumption below the threshold, WHEN there is an unassigned task in Open with all required fields filled in and a budget that fits B's margin, THEN B's agent claims it without asking for confirmation.
+- **AC2:** GIVEN B has the mode on and no pledge left this week, WHEN a poll cycle runs, THEN B's agent claims no tasks.
+- **AC3:** GIVEN B has the mode on and pledge left this week, WHEN there is an unassigned task in Open with all required fields filled in and a budget that fits in that pledge left, THEN B's agent claims it without asking for confirmation.
 - **AC4:** GIVEN B has reached max concurrency, WHEN there are eligible tasks, THEN B's agent claims no more.
-- **AC5:** GIVEN a task's budget exceeds the margin B has left before the threshold, WHEN the agent evaluates it, THEN it does not claim it and keeps looking.
+- **AC5:** GIVEN a task's budget exceeds the pledge B has left this week, WHEN the agent evaluates it, THEN it does not claim it and keeps looking.
 - **AC6:** GIVEN the owner gives no budget, WHEN the create-task skill publishes the task, THEN it uses the default budget for the estimate, or determines a budget if there is no estimate either, and the task is created with it.
-- **AC7:** GIVEN B changes their window, threshold, concurrency, threshold policy or poll interval, WHEN the next poll cycle runs, THEN the new configuration applies.
+- **AC7:** GIVEN B changes their pledge, concurrency, used-up pledge policy or poll interval, WHEN the next poll cycle runs, THEN the new configuration applies.
 
 ### Publish
 - **AC8:** GIVEN A uses the create-task skill, WHEN it finishes, THEN the task exists in the Side Hustle project with all required fields, is in Open, and has a thread in the Slack channel.
@@ -275,8 +283,8 @@ The side hustle harness (these skills, the default harness and the shared config
 - **AC16:** GIVEN an agent (picker or reviewer) is working on a task, WHEN it makes progress, THEN it updates the heartbeat periodically.
 - **AC17:** GIVEN information exists only in Slack, WHEN the agent implements, THEN it does not treat it as an instruction until it is in Asana.
 - **AC18:** GIVEN the budget runs out before reaching To Review, WHEN the agent detects it, THEN it stops, documents the state in Asana and moves the task to Needs Info.
-- **AC19:** GIVEN B crosses the threshold mid-task with the `finish` policy, WHEN the agent keeps working, THEN it completes the task and claims no more.
-- **AC20:** GIVEN B crosses the threshold mid-task with the `release` policy, WHEN the agent detects it, THEN it documents the state in Asana, unassigns the task, moves it to Next and notifies Slack.
+- **AC19:** GIVEN B's pledge is used up mid-task with the `finish` policy, WHEN the agent keeps working, THEN it completes the task and claims no more.
+- **AC20:** GIVEN B's pledge is used up mid-task with the `release` policy, WHEN the agent detects it, THEN it documents the state in Asana, unassigns the task, moves it to Next and notifies Slack.
 - **AC21:** GIVEN the implementation is finished, WHEN the agent completes it, THEN it moves the task to To Review.
 
 ### Review
@@ -318,15 +326,16 @@ The side hustle harness (these skills, the default harness and the shared config
 ### Dashboard
 - **AC46:** GIVEN any team member, WHEN they open the dashboard, THEN they see usage, flow, quality and people metrics, with names.
 - **AC47:** GIVEN an agent consumes tokens on a task, WHEN it reports its usage, THEN the dashboard attributes it to the person, model, task and phase.
-- **AC48:** GIVEN completed tasks, WHEN the dashboard is viewed, THEN actual consumption vs. budget and estimate is shown.
+- **AC48:** GIVEN completed tasks, WHEN the dashboard is viewed, THEN actual consumption vs. budget and estimate is shown, and each user's pledge vs. pledge used this week, all as % of the weekly limit.
 - **AC49:** GIVEN enough data, WHEN the dashboard is viewed, THEN optimization insights are shown that never change any configuration.
 - **AC50:** GIVEN stalled or orphaned tasks, WHEN the dashboard is viewed, THEN they are flagged.
 - **AC51:** GIVEN tasks published, picked up and completed, WHEN the leaderboard is viewed, THEN it reflects who publishes, picks up and completes the most.
 
 ### Start side hustle
-- **AC52:** GIVEN B runs `start-side-hustle` once, WHEN it starts, THEN side hustle mode is turned on and a recurring cycle runs in B's open session every poll interval with no further human action.
-- **AC53:** GIVEN the cycle is running, WHEN a cycle runs, THEN it always performs the owner agent duties for B's own tasks and orphan recovery (E6, AC42). It makes new claims and does reviewer work for tasks in To Review, including tasks B implemented (with a context independent of the implementer's), only while side hustle mode is on and B is below the threshold. Work already underway is implemented, delivered, and finished or released per its existing rules.
-- **AC54:** GIVEN the cycle is running, WHEN B turns side hustle mode off, THEN the cycle stops picking up and reviewing tasks by itself, and the owner agent duties keep running.
-- **AC55:** GIVEN the cycle is running, WHEN B crosses the threshold, THEN the current task is finished or released per B's policy, the cycle stops picking up and reviewing tasks by itself, and the owner agent duties keep running.
+- **AC52:** GIVEN B runs `start-side-hustle` once, WHEN it starts, THEN it asks only for B's weekly pledge (%), writes B's per-user configuration itself (side hustle mode on when the pledge is above 0, confirmed defaults for the rest), and a recurring cycle runs in B's open session every poll interval with no further human action.
+- **AC53:** GIVEN the cycle is running, WHEN a cycle runs, THEN it always performs the owner agent duties for B's own tasks and orphan recovery (E6, AC42). It makes new claims and does reviewer work for tasks in To Review, including tasks B implemented (with a context independent of the implementer's), only while side hustle mode is on and B has pledge left this week. Work already underway is implemented, delivered, and finished or released per its existing rules.
+- **AC54:** GIVEN the cycle is running, WHEN B sets the pledge to 0 (mode off), THEN the cycle stops picking up and reviewing tasks by itself, and the owner agent duties keep running.
+- **AC55:** GIVEN the cycle is running, WHEN B's pledge is used up, THEN the current task is finished or released per B's policy, the cycle stops picking up and reviewing tasks by itself, and the owner agent duties keep running.
 - **AC56:** GIVEN B's session closes while the cycle is running, WHEN the heartbeat timeout expires, THEN B's tasks in Doing or To Review are released to Next by another agent (AC42), with no new mechanism.
-- **AC57:** GIVEN B's cycle is already active, WHEN B runs `start-side-hustle` again, THEN nothing happens and no second cycle starts.
+- **AC57:** GIVEN B's cycle is already active, WHEN B runs `start-side-hustle` again, THEN only B's pledge is updated and no second cycle starts.
+- **AC58:** GIVEN B's cycle is running, WHEN a new week starts, THEN last week's pledge % is kept and the cycle says so once in B's session, without waiting for an answer.
