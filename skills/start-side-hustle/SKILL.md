@@ -64,7 +64,7 @@ Run these steps in order, once, then return. Never wait on a person or another a
    - Re-read `config/global.yaml` and `config/user.yaml` (AC7).
    - **Job renewal:** Claude Code scheduled jobs expire 7 days after creation. If this session's job was created more than 6 days ago, create the replacement `/loop` job first, then delete the old one. The session always keeps exactly one job.
    - **New week (E22, AC58):** if `pledge_week` is not the current ISO week, keep `pledge_percent`, set `pledge_week` to the current week, and say once in the session: "New week: keeping your side hustle pledge of <n>%." Do not wait for an answer.
-3. **Owner agent duties for B's own tasks (always, AC53).** These are the tasks B created. Use `skills/slack/SKILL.md`:
+3. **Owner agent duties for B's own tasks (always, AC53).** These are the tasks B created, never the ledger task (`usage.ledger_task`). Use `skills/slack/SKILL.md`:
    - open the thread for any own task that has none, as the authorized thread creator;
    - post pending Slack notices;
    - read replies in the threads of own tasks in Needs Info, or in Next flagged "stalled", and copy the owner's answers into Asana;

@@ -59,6 +59,6 @@ asana_project:
 # Usage reporting (skills/usage-reporting/SKILL.md). Both numbers are estimates:
 # Claude Code exposes neither the weekly limit nor a per-token price for subscriptions.
 usage:
-  weekly_limit_tokens_estimate: 50000000   # PROPOSED DEFAULT (estimate of one user's weekly limit)
-  price_usd_per_mtok: {}                   # PROPOSED DEFAULT: fill per model, e.g. {"<model id>": 5}; empty = cost n/a
-  ledger_task: ""                          # gid of the Asana task that holds the pledge records; empty = not reported
+  weekly_limit_tokens_estimate: 50000000   # PROPOSED DEFAULT, an ESTIMATE of one user's weekly limit (not an official figure)
+  price_usd_per_mtok: {}                   # PROPOSED DEFAULT: API-equivalent ESTIMATE per model, e.g. {"<model id>": 5}; empty = cost shows n/a
+  ledger_task: "1220392106821888"          # "Side hustle ledger (system, do not pick up)", completed, in Done; holds the pledge records

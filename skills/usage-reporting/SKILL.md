@@ -45,7 +45,7 @@ Before posting, read the task's comments. Never post twice for the same cycle st
 
 ## 3. Report the pledge (AC48)
 
-If `usage.ledger_task` in `config/global.yaml` is set, keep B's pledge on that task.
+Keep B's pledge on the ledger task, `usage.ledger_task` in `config/global.yaml`. It is a completed system task in Done that every other skill ignores.
 - **When:** at the first cycle of a week, and whenever `pledge_percent` changes.
 - **What:** add `Side hustle pledge: <B> · <pledge_percent>% · <ISO week>`.
 
