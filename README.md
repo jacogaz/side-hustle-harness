@@ -49,7 +49,7 @@ You can edit `config/user.yaml` at any time. The change applies from your agent'
 | `default_harness` | Path to the default harness file. |
 | `slack_channel` | Name and id of the shared side hustle channel. |
 
-Global values change only through a commit to this repo. Values marked `confirmed default` are the defaults confirmed by the owner; values marked `PROPOSED DEFAULT` await owner confirmation.
+Global values change only through a commit to this repo. Values marked `confirmed default` are the defaults confirmed by the owner.
 
 ## Rules for skills that read this configuration
 
