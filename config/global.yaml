@@ -14,12 +14,12 @@ heartbeat_timeout_hours: 2          # confirmed default
 # "stalled" and the owner agent (or the owner) releases it to Next.
 needs_info_timeout_hours: 24        # confirmed default
 
-# Default token budget per estimate size. The create-task skill applies it when
-# the owner gives an estimate but no budget.
+# Default budget per estimate size, as % of the weekly Claude usage limit.
+# The create-task skill applies it when the owner gives an estimate but no budget.
 default_budget_per_size:
-  S: 50000                          # confirmed default
-  M: 200000                         # confirmed default
-  L: 500000                         # confirmed default
+  S: 2                              # confirmed default
+  M: 5                              # confirmed default
+  L: 10                             # confirmed default
 
 # Minimal shared guidelines applied when the target repo defines no harness.
 # Path relative to the root of this repo.
