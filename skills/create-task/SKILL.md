@@ -16,7 +16,7 @@ The person running this skill is the task's **owner** (User A).
 ## 1. Read the configuration
 
 Read `config/global.yaml`. You need:
-- `asana_project`: the project gid and the gid of its Open section;
+- `asana_project`: the project gid, the gid of its Open section, and the custom field and option gids;
 - `default_budget_per_size` (% of the weekly limit: S 2, M 5, L 10);
 - `slack_channel`.
 
@@ -37,7 +37,7 @@ Go through the fields of `templates/task-description.md` in order. Ask the owner
 ## 3. Set the budget (AC6)
 
 Use the first rule that applies:
-1. **The owner gives a budget:** use it, as a positive % of the weekly limit. Source: `owner`.
+1. **The owner gives a budget:** use it, as a positive whole % of the weekly limit. Source: `owner`.
 2. **The owner gives an estimate but no budget:** use `default_budget_per_size` for that estimate. Source: `default for <S|M|L>`.
 3. **Neither is given:**
    - judge which size (S, M or L) the task matches, from its goal, acceptance criteria and target;
@@ -49,13 +49,18 @@ The task is never published without a budget.
 
 ## 4. Confirm and publish
 
-1. Write the description exactly in the format of `templates/task-description.md`, with `Last heartbeat` set to `none`.
-2. Show the owner the task name and the description once, and publish when they confirm.
-3. Create the task in the `asana_project`, in the `open` section, with **no assignee**. The name is the task name and the description is the template text.
-4. Read the task back from Asana and check that:
+1. Write the description exactly in the format of `templates/task-description.md`.
+2. Show the owner the task name, the description, and the Priority, Estimate and Budget values once. Publish when they confirm.
+3. Create the task in the `asana_project`, in the `open` section, with **no assignee**:
+   - the name is the task name and the description is the template text;
+   - set the custom fields: Priority and Estimate to their option gids (left empty if `none`), and Budget as a fraction (5% → 0.05);
+   - leave Last heartbeat empty.
+4. Add an Asana comment recording the budget and its source, for example `Budget: 5% of the weekly limit (source: default for M)`.
+5. Read the task back from Asana and check that:
    - it is in Open;
    - it is unassigned;
-   - the description parses with every required field present.
+   - the description parses with every required field present;
+   - Budget is set to the fraction you wrote.
 
    Fix anything that does not match before going on.
 
@@ -67,5 +72,5 @@ Follow **"Open the thread" in `skills/slack/SKILL.md`**. You are the owner's age
 
 ## Asana is the record (AC45)
 
-- Every instruction and decision about the task is written in Asana: in the description at publication, or as comments later. This includes field values agreed in conversation and the chosen budget and its source.
+- Every instruction and decision about the task is written in Asana: in the description, custom fields and budget comment at publication, or as comments later. This includes field values agreed in conversation and the chosen budget and its source.
 - The Slack thread only announces and links the task. Never put information there that is not also in Asana.

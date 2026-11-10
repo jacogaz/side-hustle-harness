@@ -35,3 +35,16 @@ asana_project:
   gid: "1220379119011503"
   sections:
     open: "1220379100159455"
+  # Custom fields holding Priority, Estimate, Budget and Last heartbeat
+  # (templates/task-description.md). Budget is stored as a fraction: 0.05 = 5%.
+  custom_fields:
+    priority:
+      gid: "1126953814702796"
+      options: {High: "1126953814702797", Medium: "1126953814702798", Low: "1126953814702799"}
+    estimate:
+      gid: "1220385930092876"
+      options: {S: "1220385930092877", M: "1220385930092878", L: "1220385930092879"}
+    budget:
+      gid: "1220385930092881"
+    last_heartbeat:
+      gid: "1220385930092883"
