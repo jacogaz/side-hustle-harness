@@ -1,25 +1,25 @@
 # Side hustle global configuration (SPEC.md section 6).
 # Shared by the whole team; change it through a commit to this repo.
-# Values marked "PROPOSED DEFAULT" are placeholders awaiting owner confirmation.
+# Values marked "confirmed default" are the defaults confirmed by the owner.
 
 # Number of Doing <-> To Review loops before the task moves to Needs Info.
-max_reviewer_attempts: 3            # PROPOSED DEFAULT
+max_reviewer_attempts: 3            # confirmed default
 
 # Hours without a heartbeat after which a task in Doing or To Review is orphaned
 # and any polling agent releases it to Next.
-heartbeat_timeout_hours: 2          # PROPOSED DEFAULT
+heartbeat_timeout_hours: 2          # confirmed default
 
 # Hours without an answer in Needs Info before the single reminder to the owner.
 # If the reminder also gets no answer within the same time, the task is flagged
 # "stalled" and the owner agent (or the owner) releases it to Next.
-needs_info_timeout_hours: 24        # PROPOSED DEFAULT
+needs_info_timeout_hours: 24        # confirmed default
 
 # Default token budget per estimate size. The create-task skill applies it when
 # the owner gives an estimate but no budget.
 default_budget_per_size:
-  S: 50000                          # PROPOSED DEFAULT
-  M: 200000                         # PROPOSED DEFAULT
-  L: 500000                         # PROPOSED DEFAULT
+  S: 50000                          # confirmed default
+  M: 200000                         # confirmed default
+  L: 500000                         # confirmed default
 
 # Minimal shared guidelines applied when the target repo defines no harness.
 # Path relative to the root of this repo.

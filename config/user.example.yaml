@@ -2,22 +2,22 @@
 # Copy this file to config/user.yaml (git-ignored) and edit your copy.
 # Skills re-read config/user.yaml at the start of every poll cycle, so a change
 # applies from the next poll cycle with no restart.
-# Values marked "PROPOSED DEFAULT" are placeholders awaiting owner confirmation.
+# Values marked "confirmed default" are the defaults confirmed by the owner.
 
 # Opt-in. While false, your picker agent neither looks for nor claims tasks.
 side_hustle_mode: false
 
 # Window over which your consumption is measured, e.g. "5h" or "weekly".
-usage_window: weekly                # PROPOSED DEFAULT
+usage_window: weekly                # confirmed default
 
 # % of the usage window. Your agent picks up tasks only while consumption is
 # strictly below this value.
-usage_threshold_percent: 80         # PROPOSED DEFAULT
+usage_threshold_percent: 80         # confirmed default
 
 # Maximum number of tasks your agent holds claimed at the same time.
-max_concurrency: 1                  # PROPOSED DEFAULT
+max_concurrency: 1                  # confirmed default
 
 # What to do with the current task when the threshold is crossed mid-task:
 #   finish  - complete it and pick up nothing more
 #   release - document the state in Asana, unassign, move to Next, notify Slack
-on_threshold_crossed: finish        # PROPOSED DEFAULT
+on_threshold_crossed: finish        # confirmed default
