@@ -25,7 +25,10 @@ Look at tasks in **To Review**. R may review any of them, including a task R imp
 
 The **review window** of a task starts when it last entered To Review. The **authoritative result** is the **first** `Side hustle review:` comment in the window. Any later result in the same window is void: it never moves the task and is never delivered on. The pick-up skill uses the same rule.
 
-First, in any section: if a task has a `Side hustle notice pending:` comment written by a reviewer, with no matching `Side hustle notice sent:` after it, the move was done but its Slack notice was not. Post that notice now (Slack skill), then add `Side hustle notice sent: <same transition>`. Never repeat the move.
+First, in any section: if a task has a `Side hustle notice pending:` comment written by a reviewer, with no matching `Side hustle notice sent:` or `dropped:` after it, its Slack notice may be missing. Never repeat the move. What to do depends on the task's current section:
+- **It equals the pending `<To>`:** post the notice (Slack skill). Add `Side hustle notice sent: <same transition>` only after it is actually posted.
+- **It is still `<From>`:** leave the notice pending. The move was not done, and the outcome step below applies it.
+- **Anything else:** the task has moved on since, so add `Side hustle notice dropped: <same transition>` and post nothing.
 
 Then, for each task in To Review:
 - **The window has an authoritative FAIL, and the task is still in To Review:** its outcome was not applied, for example because its reviewer stopped. Apply it now (step 5, "Apply the outcome"), whoever wrote it. Do not review again.
