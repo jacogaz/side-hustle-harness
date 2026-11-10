@@ -17,33 +17,45 @@ It uses:
 ## What counts
 
 - **The Needs Info stint:** from when the task last entered Needs Info, according to its section history.
-- **What is needed:** given by the latest agent comment in the stint that says why the task went to Needs Info. That can be:
-  - a list of missing or invalid fields (pick-up);
-  - a harness contradiction, or the budget running out (pick-up);
-  - a review report with `Outcome: attempts exhausted` or `destructive` (reviewer).
-- **An answer:** a comment by A, or a `From Slack (A, ...)` copy, written after the point the step refers to. Comments by agents never count as answers.
-- **Facts versus decisions:** A's agent may fill in a fact from its own context, such as a link, a field value, or a detail from the target or the task's links. It writes it with its source. A **decision** always needs A's answer: a contradiction, accepting a destructive change, a bigger budget, or what to do after attempts are exhausted. The agent never decides it for A.
+- **The hand-off.** These are the agent comments that caused this entry. They are usually written just **before** the move. Take the most recent ones written between the task entering its previous section and this Needs Info entry:
+  - the pick-up comment on missing or invalid fields;
+  - the pick-up comment on a harness contradiction;
+  - the `Side hustle state:` of a budget stop;
+  - or the **authoritative** review result of the To Review window the task came from, with `Outcome: attempts exhausted` or `destructive`. Void results never count.
+
+  Older blockers from earlier stints do not count.
+- **The open points:** split the hand-off into points. Each point is either a **field** (a missing or invalid template field) or a **decision**: a contradiction, a destructive change, a bigger budget, or what to do after attempts are exhausted.
+- **An answer:** a comment by A, or a `From Slack (A, ...)` copy, written after the stint started. Comments by agents never count as answers.
+- **When a point is resolved:**
+  - **A field point** is resolved when that field now parses as valid. A's agent may also fill it itself, with a fact from its own context such as a link, a value, or a detail from the target or the task's links.
+  - **A decision point** is resolved only by A's answer that settles it. The agent never decides it for A.
+  - **A destructive point** is resolved only when A changes what the task asks, so that the work needs no prohibited action. The always-applicable destructive restrictions (UC4, default harness rule 3) cannot be waived.
+- **Complete:** every open point is resolved and the template parses with every required field valid. Valid fields alone never settle a decision point.
 
 ## 1. Tasks in Needs Info
 
-For each of A's tasks in Needs Info, read it again, then take the first of these that applies.
+For each of A's tasks in Needs Info, read it again, work out its open points, and take the first of these that applies.
 
-1. **The information is complete in Asana.** Either the required fields now parse as valid, or A's answers settle every point of what is needed, with nothing left to ask.
+1. **Complete.**
    1. Write the settled values into the description or the custom fields (template editing rule for the owner agent).
-   2. Move the task to Open. Moving to Open leaves it unassigned (SPEC.md §8).
-   3. Post the "Needs Info → Open" notice (Slack skill).
-2. **A's agent can fill in what is missing from its own context** (facts only):
+   2. Read the task again, and check every required field parses with the settled value.
+   3. **Remove the assignee**, then move the task to Open.
+   4. Check the task is in Open and unassigned. The previous picker's claim record stays as it is.
+   5. Post the "Needs Info → Open" notice (Slack skill).
+2. **A field point the agent can fill from its own context:**
    1. Add a comment `Side hustle fill-in: <what> (source: <where it comes from>)`.
-   2. Write the values into the description or the custom fields.
-   3. Then handle the task as in item 1.
-3. **A has not been asked yet in this stint:**
-   1. Ask A in the task's thread, mentioning A, with one short question (Slack skill, "Owner agent asking the owner on Slack").
-   2. Add the comment `Side hustle asked: <question>`.
+   2. Write the value.
+   3. Re-check whether the task is now complete.
+3. **Some open point has not been asked about since the last answer:**
+   1. Ask A in the task's thread, mentioning A, in one short message listing only those points (Slack skill, "Owner agent asking the owner on Slack").
+   2. Add `Side hustle asked: <points>`.
    3. Leave the task in Needs Info (AC36).
-4. **No answer since the stint started, `needs_info_timeout_hours` have passed, and no reminder was sent in this stint (AC37):**
-   1. Send the single reminder in the thread, mentioning A and saying what is still missing.
-   2. Add the comment `Side hustle reminder`.
-5. **No answer since the reminder, and `needs_info_timeout_hours` have passed again (AC38, E12):** release the task as stalled.
+
+   Never ask again about a point that is already asked and still pending.
+4. **Open points remain, `needs_info_timeout_hours` have passed since the stint started, and no reminder was sent in this stint (AC37):**
+   1. Send the single reminder in the thread, mentioning A and listing the points still open.
+   2. Add `Side hustle reminder`.
+5. **Open points remain, and `needs_info_timeout_hours` have passed since the reminder (AC38, E12):** release the task as stalled.
    1. Add `Side hustle stalled`. Add it first, so the task is never claimable in Next without the flag.
    2. Add `Side hustle released: stalled`.
    3. Remove the assignee.
@@ -51,13 +63,18 @@ For each of A's tasks in Needs Info, read it again, then take the first of these
    5. Post the stalled notice mentioning A (Slack skill).
 6. **Otherwise:** leave the task as it is, and look at it again next cycle.
 
-A partial answer counts as an answer. Ask the follow-up question in the thread (and add `Side hustle asked:`), but do not restart the reminder timing.
+Partial answers resolve the points they settle, and never restart either timer. Both timers depend only on points still being open, so a partial answer can never stop the single reminder or the stalled release.
 
 ## 2. Stalled tasks in Next
 
-For each of A's tasks in Next that is flagged "stalled", meaning its latest stalled marker is `Side hustle stalled`, read it again. Once the information is complete in Asana, by the same test as item 1 above, using answers after the `Side hustle stalled` comment:
+For each of A's tasks in Next that is flagged "stalled", meaning its latest stalled marker is `Side hustle stalled`, read it again.
+- Its open points are those of the Needs Info stint that ended in the stall.
+- Answers count from the start of that stint.
+
+Once it is **complete** by the same test:
 1. Write the settled values into the description or the custom fields.
-2. Add `Side hustle stalled cleared`.
+2. Read the task again, and check the values parse.
+3. Add `Side hustle stalled cleared`.
 
 The task **stays in Next** and becomes claimable again. Do not move it to Open.
 
