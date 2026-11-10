@@ -25,8 +25,15 @@ Run them in this order. Later steps still run if an earlier one had nothing to d
 
 This step runs even when side hustle mode is off or B has no pledge left (AC53).
 1. Look at every task in Doing or To Review in the project.
-2. A task is orphaned when its `Last heartbeat` is empty or older than `heartbeat_timeout_hours`.
-3. Release each orphaned task as described in "Release a task", with reason `orphaned`. The documented state is the last known one: the latest `Side hustle state:` comment, plus the branch or draft if you can see it.
+2. A task is orphaned only after a full `heartbeat_timeout_hours` without a heartbeat in its current stint:
+   - if `Last heartbeat` is set and is later than the time the task entered its current section, it is orphaned when that heartbeat is older than the timeout;
+   - otherwise it is orphaned when the time it entered its current section (from the task's section history) is older than the timeout.
+
+   A task that was just claimed is never orphaned only because its first heartbeat is not written yet.
+3. Read the task again just before releasing it. If its section changed or its heartbeat is now fresh, leave it alone.
+4. Otherwise release it as described in "Release a task", with reason `orphaned`.
+   - Document only the last durable state you can see: the latest `Side hustle state:` comment, plus the pushed branch, its last commit, or the draft.
+   - Never touch another agent's workspace.
 
 ### 2. Keep B's work going (work already underway)
 
@@ -46,7 +53,9 @@ Skip this step unless **both** are true:
 - B has pledge left this week (AC2).
 
 Compute the pledge figures for the current ISO week:
-- **Pledge used:** the sum of the `<n>%` in every `Side hustle claim: <B> · <n>% · <this week>` comment in the project. These are the budgets B claimed this week (SPEC.md §5).
+- **Pledge used** (SPEC.md §5), in percentage points of the weekly limit:
+  - **Until usage reporting exists:** the sum of the `<n>` in B's **winning** claim markers for this ISO week (see "To claim"). These are the budgets B claimed this week.
+  - **Once usage reporting exists:** B's actual consumption on side hustle tasks this week, as published by the usage reporting skill. That skill defines the source; this skill only reads it. Reviews are attributed as the spec says: they are inside the task's budget and never charged to the reviewer's pledge.
 - **Pledge left:** `pledge_percent` minus pledge used.
 - **Active claims:** B's tasks in Doing or To Review. Stop claiming once their number reaches `max_concurrency` (AC4).
 
@@ -62,16 +71,30 @@ Look at tasks in **Open** and **Next** (Next is claimable like Open, AC12). A ta
 - move the task to Needs Info;
 - post the Needs Info notice mentioning the owner (Slack skill).
 
-**To claim an eligible task (AC3, AC10, AC11)**, without asking anyone for confirmation:
-1. Read the task again. If it is no longer unassigned, skip it silently.
-2. Assign it to B.
-3. Read it again. If the assignee is not B, another agent won: skip it with no comment and no Slack post (E1), and keep looking.
-4. If B is the assignee:
-   - move the task to Doing;
+**To claim an eligible task (AC3, AC10, AC11)**, without asking anyone for confirmation. All agents arbitrate with the same rule, using Asana alone.
+
+**Claim round and winning claim:**
+- A task's **claim round** starts when it last entered Open or Next, from its section history.
+- The **winning claim** is the earliest `Side hustle claim:` comment created in the current round.
+- Any later claim comment in the round has lost. It does not count as pledge used and gives no right to the task.
+- **Never overwrite an existing assignee.**
+
+Steps:
+1. Read the task again. If it is assigned, or the round already has a claim comment, skip it silently.
+2. Add the comment `Side hustle claim: <B> · <budget>% · <ISO week>`, where `<budget>` is the task's Budget in % of the weekly limit.
+3. Read the task's comments again and find the winning claim of the round.
+4. **If the winning claim is not B's:**
+   - delete your own claim comment;
+   - skip the task with no other comment and no Slack post (E1);
+   - reserve nothing, start no work, and keep looking.
+5. **If the winning claim is B's**, and the task is still unassigned and in Open or Next:
+   - assign the task to B;
    - set `Last heartbeat` to now;
-   - add the comment `Side hustle claim: <B> · <budget>% · <ISO week>`;
+   - move it to Doing;
    - post the claim notice (Slack skill).
-5. Recompute pledge left and active claims before the next candidate.
+
+   If by then it has an assignee, treat it as lost (step 4).
+6. Recompute pledge left and active claims before the next candidate.
 
 Claiming your own task is allowed (E15).
 
@@ -85,28 +108,27 @@ Claiming your own task is allowed (E15).
    - **Documentation:** a Confluence draft that is not published.
    - **Asana tasks:** a list of the proposed tasks, kept in a `Side hustle state:` comment. Do not create the tasks yet.
 3. **Harness:** follow the target repo's harness (CLAUDE.md/AGENTS.md, skills, commands, hooks, tests, lint, conventions), even where it contradicts B's personal configuration (AC13). If the repo has none, apply `default_harness` and say so in the deliverable (AC14).
-4. **Contradictions (AC15, E3):** if the task asks for something that contradicts the repo harness or the default harness:
+4. **Contradictions (AC15, E3):** check the task against the **effective harness**: the target repo's harness when it has one, otherwise `default_harness`. The scope, non-destructive and no-deploy rules of SPEC.md (UC4, P5) always apply in addition. If the task asks for something that contradicts them:
    - do not do it;
    - comment in Asana on the contradiction;
-   - add a `Side hustle state:` comment;
+   - save the state (see "Save the state");
    - move the task to Needs Info;
    - post the Needs Info notice.
 5. **Heartbeat (AC16):** set `Last heartbeat` to now after each significant step, and never let more than `poll_interval_minutes` pass without updating it while you work.
 6. **Budget runs out (AC18, E7):** if the task cannot be finished within its Budget (your best judgement until usage reporting measures it):
    - stop;
-   - add a `Side hustle state:` comment;
+   - save the state (see "Save the state");
    - move the task to Needs Info;
    - post the Needs Info notice.
 7. **Implementation finished (AC21):**
-   - make the work reachable for the reviewer: push the branch (no MR yet) or save the draft;
-   - add a `Side hustle state:` comment;
+   - save the state (see "Save the state"), which makes the work reachable for the reviewer: a pushed branch with no MR yet, or a saved draft;
    - set `Last heartbeat` to now;
    - move the task to To Review;
    - post the "→ To Review" notice.
 
    Then move on. The review is someone else's step, so do not wait for it.
 
-After a `FAIL` review, the reviewer moves the task back to Doing, and step 2 picks it up again in a later cycle.
+After a retryable `FAIL` that the reviewer returned to Doing (attempts remain), step 2 picks the task up again in a later cycle. A destructive failure, or a `FAIL` with attempts exhausted, goes to Needs Info (E9, E10, AC24–AC26). From there the owner-side workflow continues, not this skill.
 
 ### 5. Deliver after the review passes (AC27–AC32)
 
@@ -137,9 +159,22 @@ What release does depends on the section:
 - **Done:** refuse. Done is final.
 - **Open or Next:** do nothing and send no notification. The task is already unassigned.
 - **Doing, To Review, QA Review or Needs Info:**
-  1. Add a `Side hustle state:` comment with the branch, last commit, draft or proposed tasks, and what is left.
-  2. Remove the assignee.
-  3. Move the task to Next.
-  4. Post the release notice with the reason: voluntary, pledge used up, or orphaned (Slack skill).
+  1. If you are the agent working on the task, save the state first (see "Save the state"). For an orphaned task, document only the last durable state you can see (step 1).
+  2. Add the comment `Side hustle released: <reason>`.
+  3. Remove the assignee.
+  4. Move the task to Next.
+  5. Post the release notice with the reason: voluntary, pledge used up, or orphaned (Slack skill).
 
 Whoever claims the task next resumes from that documented state, not from scratch (AC43).
+
+## Save the state
+
+Do this before every hand-off: To Review, Needs Info, and a release by the working agent. Its purpose is that another agent, or you in a later session, can continue from Asana alone (AC43).
+1. **Make the work durable and reachable, following the repo's rules:**
+   - **Code:** commit the work in progress on `side-hustle/<task gid>` and push the branch. Never force-push and never do destructive cleanup.
+   - **Documentation:** save the Confluence draft, still unpublished.
+   - **Asana tasks:** the proposed tasks are kept in the state comment.
+2. **Add a `Side hustle state:` comment** with:
+   - the exact location: branch and last commit, or draft link, or the proposed tasks;
+   - what is done;
+   - what is left.
