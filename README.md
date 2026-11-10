@@ -31,11 +31,12 @@ You can edit `config/user.yaml` at any time. The change applies from your agent'
 
 | Key | Values | Meaning |
 |---|---|---|
-| `side_hustle_mode` | `true` / `false` | Opt-in. When `false`, your picker agent does not poll (AC1). |
+| `side_hustle_mode` | `true` / `false` | Opt-in. When `false`, your agent does not pick up or review tasks (AC1); owner agent duties still run. `start-side-hustle` turns it on (UC10). |
 | `usage_window` | e.g. `5h`, `weekly` | Window over which your consumption is measured. |
 | `usage_threshold_percent` | 0–100 | Your agent picks up tasks only while consumption is strictly below this % of the window (AC2, AC3). |
 | `max_concurrency` | integer ≥ 1 | Maximum number of tasks claimed at the same time (AC4). |
 | `on_threshold_crossed` | `finish` / `release` | What happens to the current task when the threshold is crossed mid-task (E5, AC19, AC20). |
+| `poll_interval_minutes` | integer ≥ 1 | Minutes between two cycles of your side hustle loop, started once with `start-side-hustle` (UC10). |
 
 ### Global (`config/global.yaml`)
 

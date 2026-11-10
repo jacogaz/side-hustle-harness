@@ -4,7 +4,8 @@
 # applies from the next poll cycle with no restart.
 # Values marked "confirmed default" are the defaults confirmed by the owner.
 
-# Opt-in. While false, your picker agent neither looks for nor claims tasks.
+# Opt-in. While false, your agent neither picks up nor reviews tasks; owner agent
+# duties still run. start-side-hustle turns it on (SPEC.md UC10).
 side_hustle_mode: false
 
 # Window over which your consumption is measured, e.g. "5h" or "weekly".
@@ -21,3 +22,7 @@ max_concurrency: 1                  # confirmed default
 #   finish  - complete it and pick up nothing more
 #   release - document the state in Asana, unassign, move to Next, notify Slack
 on_threshold_crossed: finish        # confirmed default
+
+# Minutes between two cycles of your side hustle loop, started once with
+# start-side-hustle (SPEC.md UC10).
+poll_interval_minutes: 15           # confirmed default
