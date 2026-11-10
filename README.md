@@ -15,6 +15,7 @@ This repo is installed by every team member. Target repos, where tasks are imple
 | `skills/start-side-hustle/SKILL.md` | The single trigger: one pledge question, writes `config/user.yaml`, starts the recurring cycle that runs the other skills. | §12, UC10, AC52–AC58 |
 | `skills/slack/SKILL.md` | Slack skill: one thread per task, transition notices, mentions, reading replies. | §12, UC1, AC44 |
 | `skills/create-task/SKILL.md` | Create-task skill: publishes a task with the full template, a budget and a Slack thread. | §12, UC1, AC6, AC8 |
+| `skills/fill-in/SKILL.md` | Fill-in skill: owner-duty cycle step for Needs Info (fill in, ask, reopen), the single reminder, stalled release and clearing. | §12, UC7, AC36–AC39 |
 | `skills/reviewer/SKILL.md` | Reviewer skill: one cycle step that reviews tasks in To Review with the four UC4 checks in an independent context. | §12, UC4, AC22–AC27 |
 | `skills/pick-up/SKILL.md` | Pick-up skill: one cycle step that recovers orphaned tasks, claims, implements, delivers after review and releases. | §12, UC2, UC3, UC5, UC8 |
 | `templates/task-description.md` | Asana task template: the description format and custom fields every skill writes and reads. | §7 |
