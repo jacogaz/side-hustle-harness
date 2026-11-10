@@ -29,46 +29,62 @@ Then set:
 
 ### 3. Start the cycle once (one active cycle per user)
 
-The cycle is **active** when `config/.cycle.lock` exists and its `last_cycle` time is younger than twice `poll_interval_minutes`.
+**Two things:**
+- **The lock.** `config/.cycle.lock` names the **owner session**, the one session whose cycle is active. It holds `session_id` and `alive_at`. The owner refreshes `alive_at` at least every `poll_interval_minutes`, also during long work (see "One cycle").
+- **The session's job.** Every session that ran `/start-side-hustle` has exactly **one** recurring Claude Code scheduled job, created with `/loop` at `poll_interval_minutes`. The job runs "One cycle" below. A session that is not the owner only checks the lock on each run (standby). This way, a session takes over automatically when the owner's session is gone.
 
-- **Active (AC57, E20):**
-  - tell B the pledge is updated;
-  - start nothing: the running cycle picks up the new pledge and mode at its next run, since every skill re-reads the config.
-- **Not active:**
-  1. Write `config/.cycle.lock` with this session's id and `last_cycle` = now.
-  2. Start the recurring cycle in this session with the Claude Code `/loop` command at `poll_interval_minutes`, for example:
-     ```
-     /loop 15m run one side hustle cycle (skills/start-side-hustle/SKILL.md, "One cycle")
-     ```
-  3. Run the first cycle right away.
+**Steps:**
+1. **Look for this session's job** in its scheduled tasks. If there is none, create it, for example:
+   ```
+   /loop 15m run one side hustle cycle (skills/start-side-hustle/SKILL.md, "One cycle")
+   ```
+   Never create a second job in the same session.
+2. **If this session is already the lock owner:** the cycle is active (AC57, E20). Only the pledge and the mode changed, and the next run reads them.
+3. **Otherwise,** run "One cycle" now. Its first step decides from the lock whether this session takes over or stays on standby.
 
 Tell B in one line:
 - the pledge, and whether side hustle mode is on;
 - that the cycle runs every `poll_interval_minutes` while this session stays open;
-- that closing the session stops it, and that the heartbeat timeout then recovers B's tasks (E18, AC56).
+- that closing the session stops it, unless another of B's open sessions that ran `/start-side-hustle` takes over; and that the heartbeat timeout then recovers B's tasks (E18, AC56).
 
 ## One cycle
 
 Run these steps in order, once, then return. Never wait on a person or another agent (AC40).
 
-1. **Housekeeping:**
+1. **Ownership (fencing):** read `config/.cycle.lock`.
+   - **This session is the owner:** go on.
+   - **Another session is the owner and its `alive_at` is younger than 2 × `poll_interval_minutes`:** stay on standby. Do nothing else in this run.
+   - **No lock, or a stale one:** take over.
+     1. Write this session as owner, with `alive_at` = now.
+     2. Read the lock again.
+     3. If another session wrote it in between, stay on standby.
+
+   **Before each later step, and at least every `poll_interval_minutes` during long work** (for example each time pick-up updates a task heartbeat):
+   - read the lock again;
+   - if this session is still the owner, set `alive_at` = now and go on;
+   - if not, this cycle was replaced: stop at once and stay on standby. A replaced cycle never continues.
+2. **Housekeeping:**
    - Re-read `config/global.yaml` and `config/user.yaml` (AC7).
-   - Set `last_cycle` in `config/.cycle.lock` to now.
+   - **Job renewal:** Claude Code scheduled jobs expire 7 days after creation. If this session's job was created more than 6 days ago, create the replacement `/loop` job first, then delete the old one. The session always keeps exactly one job.
    - **New week (E22, AC58):** if `pledge_week` is not the current ISO week, keep `pledge_percent`, set `pledge_week` to the current week, and say once in the session: "New week: keeping your side hustle pledge of <n>%." Do not wait for an answer.
-2. **Owner agent duties for B's own tasks (always, AC53).** These are the tasks B created. Use `skills/slack/SKILL.md`:
+3. **Owner agent duties for B's own tasks (always, AC53).** These are the tasks B created. Use `skills/slack/SKILL.md`:
    - open the thread for any own task that has none, as the authorized thread creator;
    - post pending Slack notices;
    - read replies in the threads of own tasks in Needs Info, or in Next flagged "stalled", and copy the owner's answers into Asana;
    - post the notice for any own-task transition B made by hand that has no notice yet.
 
    If `skills/fill-in/SKILL.md` exists, run it next for the rest of the owner duties (Needs Info completion, reminder, stalled flag; UC7). If it does not exist, skip it.
-3. **Picker duties:** run one pass of `skills/pick-up/SKILL.md`.
+4. **Picker duties:** run one pass of `skills/pick-up/SKILL.md`.
    - Its step 1 always does orphan and partial-claim recovery (E6, AC42).
    - It keeps B's work underway going, under its existing rules.
    - It makes new claims only with side hustle mode on and pledge left (AC1–AC5).
-4. **Reviewer duties:** run one pass of `skills/reviewer/SKILL.md`. It reviews only with side hustle mode on, and needs no pledge. It may review B's own task in an independent context (E21, AC53).
-5. **Usage reporting:** if `skills/usage-reporting/SKILL.md` exists, run it. Otherwise skip it.
+5. **Reviewer duties:** run one pass of `skills/reviewer/SKILL.md`. It reviews only with side hustle mode on, and needs no pledge. It may review B's own task in an independent context (E21, AC53).
+6. **Usage reporting:** if `skills/usage-reporting/SKILL.md` exists, run it. Otherwise skip it.
 
-Mode off (pledge 0) or no pledge left only stops new claims and reviews, through those skills' own gates. The cycle itself keeps running for the owner duties and recovery (AC54, AC55).
+The two gates are separate, and each is enforced by the skill it belongs to:
+- **Mode off (pledge 0)** stops new claims **and** reviews.
+- **No pledge left** stops **only** new claims. Reviews go on, including of B's own reserved task in an independent context.
 
-A cycle can take longer than the poll interval, for example while implementing a task. In that case the next run starts when this one finishes. Pick-up keeps the heartbeat updated during long work.
+Owner duties, recovery and work already underway keep their own rules. The cycle itself keeps running (AC54, AC55).
+
+A cycle can take longer than the poll interval, for example while implementing a task. In that case the next run starts when this one finishes. During long work, pick-up keeps the task heartbeat updated, and the owner check in step 1 keeps `alive_at` fresh.
