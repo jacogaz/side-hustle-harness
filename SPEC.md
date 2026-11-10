@@ -150,7 +150,7 @@ A reviews. If A approves, a human does the merge, final publication or deploy, a
 A's agent polls A's tasks in Needs Info. It fills in what is missing **in Asana** (from its own context or by asking A on Slack, asynchronously) and moves the task back to Open. If nobody answers within the Needs Info timeout, a single reminder is sent to the owner. If the reminder also gets no answer, the task is flagged "stalled" on the dashboard, released to Next with no assignee, and Slack is notified. While flagged, it cannot be claimed; when the owner provides the missing information in Asana, the flag is cleared and the task becomes eligible again.
 
 ### UC8: Release a task
-B (or B's agent) can release a task at any time, in any section except Done, which is final (including QA Review and Needs Info; a task in Open or Next is already unassigned). The state it was in is documented in Asana (branch, last commit, what is left), the task moves to Next with no assignee, and Slack is notified.
+B (or B's agent) can release a task at any time from Doing, To Review, QA Review or Needs Info; Done is final and cannot be released. Releasing a task in Open or Next is a no-op: nothing changes and no notification is sent. On a release, the state the task was in is documented in Asana (branch, last commit, what is left), the task moves to Next with no assignee, and Slack is notified.
 
 ### UC9: View the dashboard
 The whole team sees the metrics, with names (section 11).
@@ -174,7 +174,7 @@ The whole team sees the metrics, with names (section 11).
 | E13 | Information arrives only via Slack | It does not count as an instruction until it is in Asana; the owner agent copies it over. |
 | E14 | The agent resuming a task has no prior context | It continues using only what is in Asana (description, comments and documented state). |
 | E15 | The owner tries to pick up their own task | Allowed. No restriction. |
-| E16 | B wants to abandon a task | B releases it to Next at any time, unless it is in Done. |
+| E16 | B wants to abandon a task | B releases it to Next at any time from Doing, To Review, QA Review or Needs Info; not from Done. In Open or Next, release is a no-op with no notification. |
 | E17 | Someone other than the owner moves a task to Done | Not valid: only the owner marks Done. |
 
 ## 11. Dashboard
@@ -291,7 +291,7 @@ The side hustle harness (these skills, the default harness and the shared config
 - **AC40:** GIVEN an agent is waiting on anything, WHEN it waits, THEN it keeps working on other tasks and does not block.
 
 ### Release and orphaned tasks
-- **AC41:** GIVEN B or B's agent releases a task that is not in Done, WHEN they do so, THEN the state is documented in Asana, the task moves to Next with no assignee, and Slack is notified.
+- **AC41:** GIVEN B or B's agent releases a task in Doing, To Review, QA Review or Needs Info, WHEN they do so, THEN the state is documented in Asana, the task moves to Next with no assignee, and Slack is notified; a task in Done cannot be released, and releasing a task in Open or Next changes nothing and sends no notification.
 - **AC42:** GIVEN a task in Doing or To Review with no heartbeat for the timeout period, WHEN another agent polls, THEN it releases it to Next with the last known state and notifies Slack.
 - **AC43:** GIVEN an agent resumes a released task, WHEN it starts, THEN it continues from the documented state (existing branch or draft), not from scratch.
 
