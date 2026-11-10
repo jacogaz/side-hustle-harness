@@ -76,7 +76,7 @@ Run these steps in order, once, then return. Never wait on a person or another a
    - It keeps B's work underway going, under its existing rules.
    - It makes new claims only with side hustle mode on and pledge left (AC1–AC5).
 5. **Reviewer duties:** run one pass of `skills/reviewer/SKILL.md`. It reviews only with side hustle mode on, and needs no pledge. It may review B's own task in an independent context (E21, AC53).
-6. **Usage reporting:** if `skills/usage-reporting/SKILL.md` exists, run it. Otherwise skip it.
+6. **Usage reporting:** if `skills/usage-reporting/SKILL.md` exists, run it. Otherwise skip it. When it exists, keep its segment log during steps 3–5 (task, phase, start time).
 
 The two gates are separate, and each is enforced by the skill it belongs to:
 - **Mode off (pledge 0)** stops new claims **and** reviews.
