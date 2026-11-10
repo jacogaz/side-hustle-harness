@@ -31,7 +31,7 @@ You can edit `config/user.yaml` at any time. The change applies from your agent'
 | Key | Values | Meaning |
 |---|---|---|
 | `side_hustle_mode` | `true` / `false` | Opt-in. When `false`, your picker agent does not poll (AC1). |
-| `usage_window` | `5h` / `weekly` | Window over which your consumption is measured. |
+| `usage_window` | e.g. `5h`, `weekly` | Window over which your consumption is measured. |
 | `usage_threshold_percent` | 0–100 | Your agent picks up tasks only while consumption is strictly below this % of the window (AC2, AC3). |
 | `max_concurrency` | integer ≥ 1 | Maximum number of tasks claimed at the same time (AC4). |
 | `on_threshold_crossed` | `finish` / `release` | What happens to the current task when the threshold is crossed mid-task (E5, AC19, AC20). |

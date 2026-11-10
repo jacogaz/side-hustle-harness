@@ -7,7 +7,7 @@
 # Opt-in. While false, your picker agent neither looks for nor claims tasks.
 side_hustle_mode: false
 
-# Window over which your consumption is measured: "5h" or "weekly".
+# Window over which your consumption is measured, e.g. "5h" or "weekly".
 usage_window: weekly                # PROPOSED DEFAULT
 
 # % of the usage window. Your agent picks up tasks only while consumption is
