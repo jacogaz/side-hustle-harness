@@ -17,6 +17,13 @@ Re-read both config files at the start of every cycle (AC7). If `config/user.yam
 
 **Never move a task to Done (AC34) and never deploy (AC32).**
 
+**The assignee is the lock (UC2, E1).** Before every important step, read the task again: starting or resuming work, each push of the branch, moving to To Review, delivering, and releasing. If it is no longer assigned to B, B has lost it:
+- stop work on it and discard your own work on it silently, with no comment and no Slack post;
+- do not push;
+- continue with other tasks.
+
+In the rare race where one agent's assignment overwrites another's, whoever is assigned now keeps the task.
+
 ## Steps of one cycle
 
 Run them in this order. Later steps still run if an earlier one had nothing to do.
@@ -34,17 +41,15 @@ This step runs even when side hustle mode is off or B has no pledge left (AC53).
 4. Otherwise release it as described in "Release a task", with reason `orphaned`.
    - Document only the last durable state you can see: the latest `Side hustle state:` comment, plus the pushed branch, its last commit, or the draft.
    - Never touch another agent's workspace.
-5. **Abandoned claims.** Also look at every task in Open or Next whose current round has a winning claim older than `heartbeat_timeout_hours`. Such a claim never reached Doing, because its claimant stopped part-way.
+5. **Partial claims.** Also look at every task in Open or Next that is assigned but has no `Last heartbeat` set within `heartbeat_timeout_hours` of being assigned (from its history). Its claimant stopped between assigning and moving it to Doing.
    - Read the task again.
-   - If it is still in Open or Next and the claim is still the winning one, add the comment `Side hustle claim void: <claimant>`.
-   - If the task is assigned to that claimant, remove the assignee. Never remove anyone else.
-
-   The void comment starts a new claim round, so the task becomes claimable again. The voided claim no longer counts as pledge used.
+   - If nothing changed, remove the assignee. No comment and no Slack post.
+   - The task is claimable again.
 
 ### 2. Keep B's work going (work already underway)
 
-For each task assigned to B, and each task in Open or Next where B holds the winning claim:
-- **Pending claim:** B's winning claim is not void, and the task is still in Open or Next. Finish the claim idempotently with step 5 of "To claim": assign the task to B if it is unassigned or already assigned to B, set the heartbeat, move it to Doing and post the notice.
+For each task assigned to B:
+- **Pending claim:** the task is still in Open or Next. Finish the claim idempotently with steps 3–4 of "To claim". Do not write a second claim record if B already wrote one since this assignment.
 - **In Doing**, if this session is not already working on it: implement it (step 4). If it was released before, resume from the documented state (AC43).
 - **In To Review**, when the latest `Side hustle review:` comment after the task last entered To Review is `PASS`: deliver it (step 5).
 - **Anything else**, such as To Review still waiting for a review, or QA Review or Needs Info: nothing to do, move on.
@@ -61,7 +66,7 @@ Skip this step unless **both** are true:
 
 Compute the pledge figures for the current ISO week:
 - **Pledge used** (SPEC.md §5), in percentage points of the weekly limit:
-  - **Until usage reporting exists:** the sum of the `<n>` in B's **winning**, non-void claim markers for this ISO week (see "To claim"). These are the budgets B claimed this week.
+  - **Until usage reporting exists:** the sum of the `<n>` in B's `Side hustle claim:` records for this ISO week. B writes a record only after confirming it is the assignee (see "To claim"), so these are the budgets of the tasks B was assigned this week.
   - **Once usage reporting exists:** B's actual consumption on side hustle tasks this week, as published by the usage reporting skill. That skill defines the source; this skill only reads it. Reviews are attributed as the spec says: they are inside the task's budget and never charged to the reviewer's pledge.
 - **Pledge left:** `pledge_percent` minus pledge used.
 - **Active claims:** B's tasks in Doing or To Review. Stop claiming once their number reaches `max_concurrency` (AC4).
@@ -78,31 +83,16 @@ Look at tasks in **Open** and **Next** (Next is claimable like Open, AC12). A ta
 - move the task to Needs Info;
 - post the Needs Info notice mentioning the owner (Slack skill).
 
-**To claim an eligible task (AC3, AC10, AC11)**, without asking anyone for confirmation. All agents arbitrate with the same rule, using Asana alone.
-
-**Claim round and winning claim:**
-- A task's **claim round** starts at the later of two moments: when the task last entered Open or Next (from its section history), and its latest `Side hustle claim void:` comment.
-- The **winning claim** is the earliest `Side hustle claim:` comment created in the current round.
-- Any later claim comment in the round has lost. It does not count as pledge used and gives no right to the task.
-- **Never overwrite an existing assignee.**
-
-Steps:
-1. Read the task again. If it is assigned, or the round already has a claim comment, skip it silently.
-2. Add the comment `Side hustle claim: <B> · <budget>% · <ISO week>`, where `<budget>` is the task's Budget in % of the weekly limit.
-3. Read the task's comments again and find the winning claim of the round.
-4. **If the winning claim is not B's:**
-   - delete your own claim comment;
-   - skip the task with no other comment and no Slack post (E1);
-   - reserve nothing, start no work, and keep looking.
-5. **If the winning claim is B's**, and the task is still unassigned (or already assigned to B) and in Open or Next:
-   - assign the task to B;
+**To claim an eligible task (AC3, AC10, AC11)**, without asking anyone for confirmation. The assignee is the lock:
+1. Read the task again. Go on only if it is still unassigned and still eligible; otherwise skip it silently.
+2. Assign it to B.
+3. Read it again. If the assignee is not B, another agent won: skip it silently, with no comment and no Slack post (E1), reserve nothing, and keep looking.
+4. If B is the assignee:
    - set `Last heartbeat` to now;
-   - read the task's comments again; if a `Side hustle claim void:` now covers your claim, stop: the claim is lost (step 4);
-   - move it to Doing;
+   - move the task to Doing;
+   - add the claim record `Side hustle claim: <B> · <budget>% · <ISO week>`, where `<budget>` is the task's Budget in % of the weekly limit;
    - post the claim notice (Slack skill).
-
-   If by then it has another assignee, treat it as lost (step 4).
-6. Recompute pledge left and active claims before the next candidate.
+5. Recompute pledge left and active claims before the next candidate.
 
 Claiming your own task is allowed (E15).
 
