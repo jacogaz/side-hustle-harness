@@ -3,6 +3,7 @@
 # Skills re-read config/user.yaml at the start of every poll cycle, so a change
 # applies from the next poll cycle with no restart.
 # Values marked "confirmed default" are the defaults confirmed by the owner.
+# Values marked "PROPOSED DEFAULT" are placeholders awaiting owner confirmation.
 
 # Opt-in. While false, your picker agent neither looks for nor claims tasks.
 side_hustle_mode: false
@@ -21,3 +22,7 @@ max_concurrency: 1                  # confirmed default
 #   finish  - complete it and pick up nothing more
 #   release - document the state in Asana, unassign, move to Next, notify Slack
 on_threshold_crossed: finish        # confirmed default
+
+# Minutes between two cycles of your side hustle loop, started once with
+# start-side-hustle (SPEC.md UC10).
+poll_interval_minutes: 15           # PROPOSED DEFAULT

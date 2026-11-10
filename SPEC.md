@@ -4,7 +4,7 @@
 
 ## 1. Summary
 
-Some team members run short on tokens, time or focus. Others have Claude tokens left unused in their current window. **Side Hustle** lets the first group publish tasks in Asana, and the **agents** of the second group pick them up, implement them, review them and deliver them **asynchronously and autonomously**. The task **owner** always reviews and approves the final result.
+Some team members run short on tokens, time or focus. Others have Claude tokens left unused in their current window. **Side Hustle** lets the first group publish tasks in Asana, and the **agents** of the second group pick them up, implement them, review them and deliver them **asynchronously and autonomously**. The task **owner** always reviews and approves the final result. A user with spare capacity runs **one skill once** (`start-side-hustle`), and from then on the whole flow runs by itself.
 
 A **dashboard** shows team usage (tokens, models, tasks published, picked up and completed, leaderboard) and insights for optimizing the workflow.
 
@@ -21,7 +21,7 @@ A **dashboard** shows team usage (tokens, models, tasks published, picked up and
 | # | Principle |
 |---|---|
 | P1 | **Asana is the single source of truth** for instructions. Everything needed to continue a task lives in the Asana task (description and comments). Slack is for notifying and talking, never the only source of instructions. |
-| P2 | **Everything is asynchronous.** No agent waits on a human or another agent; while waiting, it keeps working on other tasks. |
+| P2 | **Everything is asynchronous.** No agent waits on a human or another agent; while waiting, it keeps working on other tasks. Once started, side hustle runs with no further human action. |
 | P3 | **The workflow never blocks.** Any task can change assignee. Orphaned or stalled tasks are released automatically. |
 | P4 | **The repository's harness wins.** Work is always executed under the target project's rules, never under rules that contradict them. |
 | P5 | **No deploy without human review.** |
@@ -33,11 +33,13 @@ A **dashboard** shows team usage (tokens, models, tasks published, picked up and
 |---|---|
 | **Owner (User A)** | Overloaded person who publishes the task. Has the context, reviews in QA Review and marks Done. |
 | **Owner agent** | A's agent. Fills in missing information on A's tasks that are in Needs Info, and clears the "stalled" flag once A has completed it. |
-| **Picker (User B)** | Person with spare token capacity who turns on side hustle mode. |
+| **Picker (User B)** | Person with spare token capacity who turns on side hustle mode and runs `start-side-hustle` once. |
 | **Picker agent** | B's agent. Polls, claims, implements and delivers. |
 | **Reviewer agent** | Independent agent (context separate from the implementer) that checks the deliverable against the task. |
 | **Slack agent** | The agents' ability to post and listen in the side hustle channel. |
 | **Team** | The whole team; sees the dashboard. |
+
+Once a user runs `start-side-hustle`, the recurring cycle in that user's session plays that user's picker agent, reviewer agent and owner agent roles (UC10).
 
 ## 5. Per-user configuration
 
@@ -48,6 +50,7 @@ A **dashboard** shows team usage (tokens, models, tasks published, picked up and
 | Usage threshold | % of the window below which the agent may pick up tasks. |
 | Max concurrency | Number of tasks claimed at the same time. |
 | On crossing the threshold mid-task | `finish` or `release`. |
+| Poll interval | Time between two cycles of the user's side hustle loop (UC10). |
 
 ## 6. Global configuration (side hustle)
 
@@ -155,6 +158,14 @@ B (or B's agent) can release a task at any time from Doing, To Review, QA Review
 ### UC9: View the dashboard
 The whole team sees the metrics, with names (section 11).
 
+### UC10: Start side hustle
+B runs the `start-side-hustle` skill once. It starts a recurring cycle in B's open session that repeats every poll interval, with no further human action. In each cycle, for B, it does:
+- **Picker duties:** check side hustle mode, the threshold and max concurrency; claim eligible tasks (UC2); implement them with the heartbeat (UC3); release orphaned tasks (E6); deliver after the review passes (UC5).
+- **Reviewer duties:** review tasks in To Review (UC4), with a context independent of the implementer's.
+- **Owner agent duties for B's own tasks:** handle Needs Info, the reminder and stalled tasks (UC7); open and follow the Slack threads; copy replies into Asana; post the notices for transitions B made by hand.
+
+The cycle stops by itself when B turns side hustle mode off, or when B crosses the threshold (after finishing or releasing the current task, per B's policy). If B's session closes, B's tasks are recovered by the existing heartbeat timeout (E6).
+
 ## 10. Edge cases
 
 | # | Case | Behavior |
@@ -176,6 +187,8 @@ The whole team sees the metrics, with names (section 11).
 | E15 | The owner tries to pick up their own task | Allowed. No restriction. |
 | E16 | B wants to abandon a task | B releases it to Next at any time from Doing, To Review, QA Review or Needs Info; not from Done. In Open or Next, release is a no-op with no notification. |
 | E17 | Someone other than the owner moves a task to Done | Not valid: only the owner marks Done. |
+| E18 | B's session closes while side hustle is running | The cycle stops; B's tasks in Doing or To Review are released by another agent when the heartbeat timeout expires (E6). |
+| E19 | B turns side hustle mode off or crosses the threshold while the cycle runs | The cycle stops by itself; with the threshold, the current task is first finished or released per B's policy (E5). |
 
 ## 11. Dashboard
 
@@ -201,6 +214,7 @@ The side hustle harness (these skills, the default harness and the shared config
 - **Reviewer:** the four checks in UC4.
 - **Fill in information:** poll own tasks in Needs Info and update them in Asana; clear the "stalled" flag once the information is complete.
 - **Usage reporting:** publish metrics to the dashboard.
+- **Start side hustle (`start-side-hustle`):** the single trigger a user runs once; it starts the recurring cycle that runs the user's picker, reviewer and owner agent duties every poll interval (UC10).
 
 ## 13. Pain points addressed
 
@@ -241,7 +255,7 @@ The side hustle harness (these skills, the default harness and the shared config
 - **AC4:** GIVEN B has reached max concurrency, WHEN there are eligible tasks, THEN B's agent claims no more.
 - **AC5:** GIVEN a task's budget exceeds the margin B has left before the threshold, WHEN the agent evaluates it, THEN it does not claim it and keeps looking.
 - **AC6:** GIVEN the owner gives no budget, WHEN the create-task skill publishes the task, THEN it uses the default budget for the estimate, or determines a budget if there is no estimate either, and the task is created with it.
-- **AC7:** GIVEN B changes their window, threshold, concurrency or threshold policy, WHEN the next poll cycle runs, THEN the new configuration applies.
+- **AC7:** GIVEN B changes their window, threshold, concurrency, threshold policy or poll interval, WHEN the next poll cycle runs, THEN the new configuration applies.
 
 ### Publish
 - **AC8:** GIVEN A uses the create-task skill, WHEN it finishes, THEN the task exists in the Side Hustle project with all required fields, is in Open, and has a thread in the Slack channel.
@@ -306,3 +320,10 @@ The side hustle harness (these skills, the default harness and the shared config
 - **AC49:** GIVEN enough data, WHEN the dashboard is viewed, THEN optimization insights are shown that never change any configuration.
 - **AC50:** GIVEN stalled or orphaned tasks, WHEN the dashboard is viewed, THEN they are flagged.
 - **AC51:** GIVEN tasks published, picked up and completed, WHEN the leaderboard is viewed, THEN it reflects who publishes, picks up and completes the most.
+
+### Start side hustle
+- **AC52:** GIVEN B runs `start-side-hustle` once, WHEN it starts, THEN a recurring cycle runs in B's open session every poll interval with no further human action.
+- **AC53:** GIVEN the cycle is running, WHEN a cycle runs, THEN it performs B's picker duties, reviewer duties for tasks in To Review (with a context independent of the implementer's), and owner agent duties for B's own tasks.
+- **AC54:** GIVEN the cycle is running, WHEN B turns side hustle mode off, THEN the cycle stops by itself.
+- **AC55:** GIVEN the cycle is running, WHEN B crosses the threshold, THEN the current task is finished or released per B's policy and the cycle stops by itself.
+- **AC56:** GIVEN B's session closes while the cycle is running, WHEN the heartbeat timeout expires, THEN B's tasks in Doing or To Review are released to Next by another agent (AC42), with no new mechanism.

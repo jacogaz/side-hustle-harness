@@ -36,6 +36,7 @@ You can edit `config/user.yaml` at any time. The change applies from your agent'
 | `usage_threshold_percent` | 0–100 | Your agent picks up tasks only while consumption is strictly below this % of the window (AC2, AC3). |
 | `max_concurrency` | integer ≥ 1 | Maximum number of tasks claimed at the same time (AC4). |
 | `on_threshold_crossed` | `finish` / `release` | What happens to the current task when the threshold is crossed mid-task (E5, AC19, AC20). |
+| `poll_interval_minutes` | integer ≥ 1 | Minutes between two cycles of your side hustle loop, started once with `start-side-hustle` (UC10). |
 
 ### Global (`config/global.yaml`)
 
@@ -48,7 +49,7 @@ You can edit `config/user.yaml` at any time. The change applies from your agent'
 | `default_harness` | Path to the default harness file. |
 | `slack_channel` | Name and id of the shared side hustle channel. |
 
-Global values change only through a commit to this repo. Values marked `confirmed default` are the defaults confirmed by the owner.
+Global values change only through a commit to this repo. Values marked `confirmed default` are the defaults confirmed by the owner; values marked `PROPOSED DEFAULT` await owner confirmation.
 
 ## Rules for skills that read this configuration
 
