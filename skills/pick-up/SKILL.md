@@ -17,12 +17,14 @@ Re-read both config files at the start of every cycle (AC7). If `config/user.yam
 
 **Never move a task to Done (AC34) and never deploy (AC32).**
 
-**The assignee is the lock (UC2, E1).** Before every important step, read the task again: starting or resuming work, each push of the branch, moving to To Review, delivering, and releasing. If it is no longer assigned to B, B has lost it:
+**The assignee is the lock (UC2, E1).** For B's own work, read the task again before every important step: starting or resuming work, each push of the branch, moving to To Review, delivering, and a voluntary release. If it is no longer assigned to B, B has lost it:
 - stop work on it and discard your own work on it silently, with no comment and no Slack post;
 - do not push;
 - continue with other tasks.
 
 In the rare race where one agent's assignment overwrites another's, whoever is assigned now keeps the task.
+
+This check does not apply when recovering another user's task: an orphaned task (step 1) or a partial claim (step 1, item 5). Those have their own fresh checks of section and heartbeat, and they act on tasks not assigned to B.
 
 ## Steps of one cycle
 
@@ -41,15 +43,17 @@ This step runs even when side hustle mode is off or B has no pledge left (AC53).
 4. Otherwise release it as described in "Release a task", with reason `orphaned`.
    - Document only the last durable state you can see: the latest `Side hustle state:` comment, plus the pushed branch, its last commit, or the draft.
    - Never touch another agent's workspace.
-5. **Partial claims.** Also look at every task in Open or Next that is assigned but has no `Last heartbeat` set within `heartbeat_timeout_hours` of being assigned (from its history). Its claimant stopped between assigning and moving it to Doing.
+5. **Partial claims.** Also look at every task in Open or Next that is assigned. Its claimant stopped before moving it to Doing. Take the later of two times: when it was assigned (from its history), and its `Last heartbeat` if set. The task is a partial claim when that time is older than `heartbeat_timeout_hours`.
    - Read the task again.
-   - If nothing changed, remove the assignee. No comment and no Slack post.
+   - If it is still assigned to the same user, still in Open or Next, and still stale, remove the assignee. No comment and no Slack post.
+   - A fresh or completed claim is left alone. This is recovery of an incomplete claim, not a release, so it is not the Open/Next release no-op.
    - The task is claimable again.
 
 ### 2. Keep B's work going (work already underway)
 
 For each task assigned to B:
-- **Pending claim:** the task is still in Open or Next. Finish the claim idempotently with steps 3–4 of "To claim". Do not write a second claim record if B already wrote one since this assignment.
+- **Claim record repair (first):** if the current assignment to B, from the task's history, has no `Side hustle claim:` record by B written after it, add one now, once. Use the ISO week of that assignment, not the current week. This way a crash can never leave a claimed task out of pledge accounting.
+- **Pending claim:** the task is still in Open or Next. Finish the claim idempotently with steps 3–4 of "To claim". The claim record was already repaired above, so do not write a second one.
 - **In Doing**, if this session is not already working on it: implement it (step 4). If it was released before, resume from the documented state (AC43).
 - **In To Review**, when the latest `Side hustle review:` comment after the task last entered To Review is `PASS`: deliver it (step 5).
 - **Anything else**, such as To Review still waiting for a review, or QA Review or Needs Info: nothing to do, move on.
@@ -88,9 +92,9 @@ Look at tasks in **Open** and **Next** (Next is claimable like Open, AC12). A ta
 2. Assign it to B.
 3. Read it again. If the assignee is not B, another agent won: skip it silently, with no comment and no Slack post (E1), reserve nothing, and keep looking.
 4. If B is the assignee:
+   - add the claim record `Side hustle claim: <B> · <budget>% · <ISO week>` first, where `<budget>` is the task's Budget in % of the weekly limit;
    - set `Last heartbeat` to now;
    - move the task to Doing;
-   - add the claim record `Side hustle claim: <B> · <budget>% · <ISO week>`, where `<budget>` is the task's Budget in % of the weekly limit;
    - post the claim notice (Slack skill).
 5. Recompute pledge left and active claims before the next candidate.
 
