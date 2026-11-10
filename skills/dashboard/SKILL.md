@@ -11,8 +11,8 @@ Any team member runs this skill to see the dashboard (SPEC.md §11, AC46–AC51)
 
 ## Inputs
 
-- **`config/global.yaml`:** `asana_project` (project, sections and custom fields), `usage.ledger_task` and `heartbeat_timeout_hours`.
-- **Every task in the project except the ledger task:** read its name, creator, assignee, section history, custom fields (Budget, Estimate, Last heartbeat) and comments. The markers are defined in `templates/task-description.md`.
+- **`config/global.yaml`:** `asana_project` (project, sections and custom fields), `usage.ledger_task`, `heartbeat_timeout_hours` and `default_budget_per_size`.
+- **Every task in the project except the ledger task:** read its name, creator, assignee, section and assignment history, custom fields (Budget, Estimate, Last heartbeat) and comments. The markers are defined in `templates/task-description.md`.
 - **The ledger task:** read only its `Side hustle pledge:` comments.
 - **Week:** the current ISO week by default. The user may name another week.
 - **People:** shown by their Asana names.
@@ -35,7 +35,8 @@ Sources are the `Side hustle usage:` comments of the week, and the ledger's `Sid
 - **Total Open → Done time:** for each Done task, from creation to its last move to Done. Show the average and the per-task value.
 - **Flags (AC50):**
   - **stalled:** the latest stalled marker is `Side hustle stalled`;
-  - **orphaned:** in Doing or To Review with no heartbeat for `heartbeat_timeout_hours` (the same rule as pick-up step 1), or released this week with `Side hustle released: orphaned`.
+  - **orphaned (now):** the task is in Doing or To Review, and is orphaned under pick-up step 1's full rule for its current stint. The reference time is its `Last heartbeat` if that is later than its entry into the current section, otherwise the entry time, and it must be older than `heartbeat_timeout_hours`. Only currently orphaned tasks are flagged.
+  - **Orphan releases (history):** a separate, dated list of this week's `Side hustle released: orphaned` events. They never flag a task that was later recovered or completed.
 
 ### Quality
 
@@ -48,11 +49,15 @@ Sources are the `Side hustle usage:` comments of the week, and the ledger's `Sid
 A leaderboard, all time and this week:
 - **publishes:** tasks created;
 - **picks up:** `Side hustle claim:` records;
-- **completes:** tasks that reached Done, counted for the user assigned when the task reached Done, who is the picker who delivered it.
+- **completes:** tasks that reached Done, credited to the picker who delivered them. That is the author of the latest `Side hustle claim:` record written before the task's last move to QA Review. If there is no such record, use the assignee at the moment of the Done move, from the task's assignment history. If neither is available, count the task as "unknown". Never fall back to the current assignee.
 
 ### Optimization (AC48)
 
-- **Completed tasks:** for each Done task, actual consumption against Budget and Estimate. Actual is the sum of the `~<pct>%` in all its usage lines, all users and phases. Also show the difference, actual minus Budget.
+- **Completed tasks:** for each Done task, show these, all as % of the weekly limit:
+  - actual: the sum of the `~<pct>%` in all its usage lines, all users and phases;
+  - Budget, and actual minus Budget;
+  - the Estimate as its size (S/M/L) **and** its baseline, which is `default_budget_per_size` for that size in `config/global.yaml`, labelled "estimate baseline"; also actual minus that baseline;
+  - for a task with no Estimate, show `none` with no baseline. Never treat the Budget as the Estimate.
 - **Per model:** the cost, and the success rate. The success rate is the % of tasks whose implementation used that model and were approved by the owner on the first pass.
 - **Bottlenecks:** the average time in, and current count of, Needs Info and QA Review.
 
