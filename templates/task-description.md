@@ -57,7 +57,7 @@ The option gids for Priority and Estimate are in `config/global.yaml`.
 | Priority (custom field) | No | One of its options, or empty. |
 | Estimate (custom field) | No | One of its options, or empty. |
 | Budget (custom field) | Yes | A positive fraction (e.g. 0.05 = 5%). It is a % of the weekly Claude usage limit and is reserved from the claimer's pledge at claim (SPEC.md §5). |
-| Last heartbeat (custom field) | System | Empty at publication. Only the agent currently working on the task sets it (SPEC.md §7). |
+| Last heartbeat (custom field) | System | Empty at publication. Set by the picker (the assignee) while the task is in Doing or To Review, including while it waits for review or delivery, and by the reviewer while reviewing (SPEC.md §7). |
 
 ## Parsing rules (for every skill)
 
@@ -82,7 +82,9 @@ Skills recognize their own Asana comments by a fixed first line. Each marker is 
 |---|---|---|
 | `Side hustle Slack thread: <permalink>` | Owner agent (Slack skill) | The task's Slack thread. |
 | `Side hustle claim: <user> · <n>% · <ISO week>` | Picker agent (pick-up skill) | Claim record, written only after `<user>` is confirmed as the assignee. `<n>` is the task's Budget, in % of the weekly Claude usage limit, reserved from `<user>`'s pledge for that week. The assignee is the lock; this record is only for pledge accounting. |
+| `Side hustle notice pending: <From> → <To> · <reason>` / `Side hustle notice sent: <same>` / `Side hustle notice dropped: <same>` | Reviewer agent (reviewer skill) | A section move whose Slack notice may still be missing. The next reviewer cycle handles a pending notice with no `sent` or `dropped` after it: it posts the notice only while the task is in `<To>`, then marks it `sent`; it drops the notice if the task has moved past `<To>`. |
 | `Side hustle released: <reason>` | The releasing agent (pick-up skill) | The task was released to Next: voluntary, pledge used up, or orphaned. |
 | `Side hustle state:` | Picker agent or any releasing agent | Documented state: branch, last commit, draft or proposed tasks, what is left. |
-| `Side hustle review: PASS` or `Side hustle review: FAIL` | Reviewer agent (reviewer skill) | The review result and report (SPEC.md UC4, AC23). |
+| `Side hustle review started: <user>` | Reviewer agent (reviewer skill) | `<user>` is reviewing the task. Other reviewers skip the task while this comment is younger than `heartbeat_timeout_hours`. |
+| `Side hustle review: PASS` or `Side hustle review: FAIL` | Reviewer agent (reviewer skill) | The review result and report (SPEC.md UC4, AC23). The second line is `Outcome: pass`, `retry (attempt <n> of <max>)`, `attempts exhausted` or `destructive`. Only the first result after the task last entered To Review is authoritative. Later results in that window are void. The reviewer applies the authoritative outcome, and the picker delivers only on an authoritative PASS. |
 | `Side hustle stalled` / `Side hustle stalled cleared` | Owner agent (fill-in skill) | The "stalled" flag. A task is flagged while its latest of these two comments is `Side hustle stalled`. |

@@ -91,7 +91,7 @@ A **week** is the calendar week (ISO week, Monday to Sunday), the same for the w
 | Priority | No | High / Medium / Low. |
 | Estimate | No | S / M / L. |
 | Budget | Yes | % of the weekly usage limit. If the owner gives none, the create-task skill sets it when publishing: the default for the estimate, or, with no estimate either, a budget it determines. |
-| Last heartbeat | System | Updated by the agent currently working on the task while it is in Doing or To Review (the picker agent implementing or delivering, the reviewer agent reviewing). There is no heartbeat once the task is in QA Review; it starts again if the task returns to Doing. |
+| Last heartbeat | System | Updated by the agent currently working on the task while it is in Doing or To Review (the picker agent implementing, waiting for review or delivering, the reviewer agent reviewing). There is no heartbeat once the task is in QA Review; it starts again if the task returns to Doing. |
 
 ## 8. Lifecycle (Asana sections)
 
