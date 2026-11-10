@@ -10,16 +10,16 @@ This repo is installed by every team member. Target repos, where tasks are imple
 |---|---|---|
 | `config/global.yaml` | Global configuration, shared by the team. | §6 |
 | `config/user.example.yaml` | Template for per-user configuration. | §5 |
-| `config/user.yaml` | Your own per-user configuration (git-ignored). Written by `start-side-hustle`; until that skill exists, created by you. | §5 |
+| `config/user.yaml` | Your own per-user configuration (git-ignored). Written by `start-side-hustle` (specified in SPEC.md UC10, not yet implemented). | §5 |
 | `harness/DEFAULT_HARNESS.md` | Default harness, applied when a target repo has none. | E4, AC14 |
 | `skills/slack/SKILL.md` | Slack skill: one thread per task, transition notices, mentions, reading replies. | §12, UC1, AC44 |
 
 ## Setup (each team member)
 
 1. Clone or install this repo.
-2. Run `start-side-hustle`. It asks one question, how much of your weekly Claude usage to pledge (a %), and writes `config/user.yaml` for you with the confirmed defaults for everything else. Nobody copies or edits the file by hand. Run it again to change your pledge.
+2. Run `start-side-hustle`. It asks one question, how much of your weekly Claude usage to pledge (a %), and writes `config/user.yaml` for you with the confirmed defaults for everything else. Nobody copies or edits the file by hand. Run it again to change your pledge; side hustle mode follows it. A change applies from your agent's next poll cycle.
 
-Until `start-side-hustle` exists, do this by hand: `cp config/user.example.yaml config/user.yaml`, then set `pledge_percent`, `pledge_week` and `side_hustle_mode: true`. A change applies from your agent's next poll cycle.
+`start-side-hustle` is specified (SPEC.md UC10) but not yet implemented.
 
 ## Configuration reference
 
@@ -28,10 +28,10 @@ Until `start-side-hustle` exists, do this by hand: `cp config/user.example.yaml 
 | Key | Values | Meaning |
 |---|---|---|
 | `pledge_percent` | 0–100 | % of your weekly Claude usage limit given to shared side hustle tasks this week. `0` means owner duties only. Your agent claims a task only if its budget fits in the pledge left this week (AC2, AC3, AC5). |
-| `pledge_week` | ISO week, e.g. `2026-W46` | Week the pledge applies to. A new week keeps last week's pledge (E22). |
+| `pledge_week` | ISO week, e.g. `2026-W46` | Calendar week (Monday to Sunday, same for the whole team) the pledge applies to. A new week keeps last week's pledge (E22). |
 | `side_hustle_mode` | `true` / `false` | `true` when `pledge_percent` is above 0. When `false`, your agent does not pick up or review tasks (AC1); owner agent duties still run. |
 | `max_concurrency` | integer ≥ 1 | Maximum number of tasks claimed at the same time (AC4). |
-| `on_pledge_used_up` | `finish` / `release` | What happens to the current task when your pledge is used up mid-task (E5, AC19, AC20). |
+| `on_pledge_used_up` | `finish` / `release` | What happens to the current task when your pledge is used up mid-task (E5, AC19, AC20). Applies only once actual usage is measured; until then a claimed task's budget is reserved for the whole task. |
 | `poll_interval_minutes` | integer ≥ 1 | Minutes between two cycles of your side hustle loop, started once with `start-side-hustle` (UC10). |
 
 ### Global (`config/global.yaml`)

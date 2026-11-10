@@ -1,7 +1,7 @@
 # Side hustle per-user configuration (SPEC.md section 5).
 # start-side-hustle writes config/user.yaml (git-ignored) itself: it asks only for
 # your weekly pledge and uses the confirmed defaults below for everything else.
-# Until that skill exists, copy this file to config/user.yaml and edit your copy.
+# start-side-hustle is specified (SPEC.md UC10) but not yet implemented.
 # Skills re-read config/user.yaml at the start of every poll cycle, so a change
 # applies from the next poll cycle with no restart.
 # Values marked "confirmed default" are the defaults confirmed by the owner.
@@ -10,18 +10,20 @@
 # week (e.g. 5, 10, 20). 0 = only follow up on your own tasks (owner duties only).
 pledge_percent: 0
 
-# Week the pledge applies to (ISO week, e.g. 2026-W46). At the start of a new
-# week, start-side-hustle's cycle keeps last week's pledge and updates this.
+# Week the pledge applies to: the calendar week (ISO week, Monday to Sunday,
+# e.g. 2026-W46), the same for the whole team. At the start of a new week,
+# start-side-hustle's cycle keeps last week's pledge and updates this.
 pledge_week: ""
 
-# On when pledge_percent is above 0, off at 0. While off, your agent neither
+# On when pledge_percent is above 0, off at 0 (start-side-hustle keeps it in sync). While off, your agent neither
 # picks up nor reviews tasks; owner agent duties still run.
 side_hustle_mode: false
 
 # Maximum number of tasks your agent holds claimed at the same time.
 max_concurrency: 1                  # confirmed default
 
-# What to do with the current task when your pledge is used up mid-task:
+# What to do with the current task when your pledge is used up mid-task
+# (applies only once actual usage is measured):
 #   finish  - complete it and pick up nothing more
 #   release - document the state in Asana, unassign, move to Next, notify Slack
 on_pledge_used_up: finish           # confirmed default
