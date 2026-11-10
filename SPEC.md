@@ -22,7 +22,7 @@ A **dashboard** shows team usage (tokens, models, tasks published, picked up and
 |---|---|
 | P1 | **Asana is the single source of truth** for instructions. Everything needed to continue a task lives in the Asana task (description and comments). Slack is for notifying and talking, never the only source of instructions. |
 | P2 | **Everything is asynchronous.** No agent waits on a human or another agent; while waiting, it keeps working on other tasks. |
-| P3 | **The workflow never blocks.** Any task can change assignee. Orphaned tasks are released automatically; stalled tasks are flagged. |
+| P3 | **The workflow never blocks.** Any task can change assignee. Orphaned or stalled tasks are released automatically. |
 | P4 | **The repository's harness wins.** Work is always executed under the target project's rules, never under rules that contradict them. |
 | P5 | **No deploy without human review.** |
 | P6 | **Only the owner** approves the deliverable and moves the task to Done. |
@@ -281,7 +281,7 @@ The side hustle harness (these skills, the default harness and the shared config
 - **AC35:** GIVEN the owner rejects, WHEN they do so, THEN they leave an Asana comment on how to proceed, the task moves to Next with no assignee, and Slack is notified.
 
 ### Needs Info and owner agent
-- **AC36:** GIVEN one of A's tasks is in Needs Info, WHEN A's agent polls, THEN it fills in what is missing in Asana (or asks A on Slack asynchronously) and moves it to Open.
+- **AC36:** GIVEN one of A's tasks is in Needs Info, WHEN A's agent polls, THEN it fills in what is missing in Asana (or asks A on Slack asynchronously, leaving the task in Needs Info) and moves it to Open once the information is in Asana.
 - **AC37:** GIVEN a task in Needs Info with no answer when the timeout expires, WHEN the deadline passes, THEN a single reminder is sent to the owner.
 - **AC38:** GIVEN the reminder also gets no answer, WHEN the deadline passes again, THEN the task is flagged "stalled" on the dashboard.
 - **AC39:** GIVEN the owner answers only on Slack, WHEN the owner agent detects it, THEN it copies the answer into Asana before moving the task back to Open.
@@ -303,3 +303,17 @@ The side hustle harness (these skills, the default harness and the shared config
 - **AC49:** GIVEN enough data, WHEN the dashboard is viewed, THEN optimization insights are shown that never change any configuration.
 - **AC50:** GIVEN stalled or orphaned tasks, WHEN the dashboard is viewed, THEN they are flagged.
 - **AC51:** GIVEN tasks published, picked up and completed, WHEN the leaderboard is viewed, THEN it reflects who publishes, picks up and completes the most.
+
+---
+
+## Open questions (for the owner)
+
+These are unresolved conflicts or gaps in the spec. They are recorded here instead of being decided.
+
+- **Q1: Stalled tasks.** P3 says orphaned or stalled tasks are released automatically, but UC7, E12 and AC38 only send a single reminder and then flag the task "stalled" on the dashboard. Should stalled tasks also be released (and if so, to which section and when), or does P3 only mean flagging them?
+- **Q2: No budget and no estimate.** Both Token budget and Estimate are optional, and the default budget is chosen by estimate. What happens to a task with neither: is an estimate (or budget) required, is the task skipped, or does it go to Needs Info?
+- **Q3: Which states allow a voluntary release.** UC8, E16 and AC41 let B release a task "at any time", but the only release transition is Doing/To Review → Next. Can a task in QA Review or Needs Info be released? (Orphaned-task release stays limited to Doing/To Review.)
+- **Q4: Who delivers.** The Actors table says the picker agent delivers, but the transitions and AC27 place the delivery after the reviewer passes, and the reviewer moves the task to QA Review. Who performs the delivery (UC5), and for code, does the branch or MR exist before the review?
+- **Q5: Assignee on claim.** AC10 says the task is assigned to B; UC2 and the transitions say the agent assigns the task to itself. Are these the same (the agent acts under B's account)?
+- **Q6: Consumption exactly at the threshold.** UC2 and AC3 say "below" and AC2 says "above". Can B's agent claim when consumption equals the threshold?
+- **Q7: Heartbeat in To Review.** AC42 releases a task in To Review with no heartbeat, but only the implementing agent is said to update the heartbeat (UC3, AC16). Does the reviewer agent also update it?
