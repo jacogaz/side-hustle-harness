@@ -29,3 +29,9 @@ default_harness: harness/DEFAULT_HARNESS.md
 slack_channel:
   name: "#it5-iubenda-side-hustle"
   id: C0CGCT0CRMY
+
+# Asana project where side hustle tasks live, and the gids of its sections.
+asana_project:
+  gid: "1220379119011503"
+  sections:
+    open: "1220379100159455"
