@@ -1,13 +1,13 @@
 ---
 name: side-hustle-create-task
-description: Publish a side hustle task in Asana with the full template, a token budget and a Slack thread. Use when an owner wants to hand off a task to the side hustle team.
+description: Publish a side hustle task in Asana with the full template, a budget and a Slack thread. Use when an owner wants to hand off a task to the side hustle team.
 ---
 
 # Create task skill (side hustle)
 
 The owner, or the owner's agent on their behalf, uses this skill to publish a task in the Side Hustle Asana project (SPEC.md UC1). The task:
 - has every template field (`templates/task-description.md`);
-- always has a token budget;
+- always has a budget, as % of the weekly Claude usage limit;
 - is unassigned and in Open;
 - has its own Slack thread.
 
@@ -17,7 +17,7 @@ The person running this skill is the task's **owner** (User A).
 
 Read `config/global.yaml`. You need:
 - `asana_project`: the project gid and the gid of its Open section;
-- `default_budget_per_size`;
+- `default_budget_per_size` (% of the weekly limit: S 2, M 5, L 10);
 - `slack_channel`.
 
 ## 2. Collect every template field
@@ -30,14 +30,14 @@ Go through the fields of `templates/task-description.md` in order. Ask the owner
 - **Acceptance criteria** (required): at least one verifiable item. If an item cannot be checked (for example "make it better"), ask the owner to make it verifiable.
 - **Out of scope / do not touch** (required): at least one item. If the owner names nothing, write `nothing beyond the acceptance criteria` and confirm it with them.
 - **Context / links**, **Priority**, **Estimate** (optional): empty means `none`.
-- **Token budget:** see step 3.
+- **Budget:** see step 3.
 
 **Refuse to publish while a required field is missing or invalid.** Say which field is missing and ask for it. If the owner stops, create nothing.
 
-## 3. Set the token budget (AC6)
+## 3. Set the budget (AC6)
 
 Use the first rule that applies:
-1. **The owner gives a budget:** use it, as a positive integer number of tokens. Source: `owner`.
+1. **The owner gives a budget:** use it, as a positive % of the weekly limit. Source: `owner`.
 2. **The owner gives an estimate but no budget:** use `default_budget_per_size` for that estimate. Source: `default for <S|M|L>`.
 3. **Neither is given:**
    - judge which size (S, M or L) the task matches, from its goal, acceptance criteria and target;

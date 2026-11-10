@@ -34,8 +34,8 @@ Side hustle task (template v1)
 ## Estimate
 <S | M | L | none>
 
-## Token budget
-<integer> tokens (source: <owner | default for S | default for M | default for L | determined>)
+## Budget
+<number>% of the weekly limit (source: <owner | default for S | default for M | default for L | determined>)
 
 ## Last heartbeat
 <none | YYYY-MM-DDTHH:MMZ by <agent's user>>
@@ -53,7 +53,7 @@ Side hustle task (template v1)
 | Context / links | No | Free text, or `none`. |
 | Priority | No | `High`, `Medium`, `Low` or `none`. |
 | Estimate | No | `S`, `M`, `L` or `none`. |
-| Token budget | Yes | A positive integer followed by `tokens` and the source in parentheses. |
+| Budget | Yes | A positive number followed by `% of the weekly limit` and the source in parentheses. It is a % of the weekly Claude usage limit and is reserved from the claimer's pledge at claim (SPEC.md §5). |
 | Last heartbeat | System | `none` at publication. Only the agent currently working on the task updates this line (SPEC.md §7). |
 
 ## Parsing rules (for every skill)
@@ -62,7 +62,7 @@ Side hustle task (template v1)
 - **Section bodies.** A section's value is the text between its heading and the next `## ` heading, trimmed.
 - **Optional fields.** An empty value or `none` means "not set".
 - **Required fields.** A required field is **missing** if its section is absent, empty, `none`, or has a value outside the valid values above. A task with a missing required field is not eligible (SPEC.md E2, AC9).
-- **Token budget.** The budget is the first integer in the section.
+- **Budget.** The budget is the number before the first `%` in the section, as a % of the weekly limit.
 - **Instructions.** Everything an agent needs to know comes from this description and the task's comments (SPEC.md P1). The description is the canonical value of each field.
 - **Editing.** Only these may edit the description:
   - **The owner**, in this format.
