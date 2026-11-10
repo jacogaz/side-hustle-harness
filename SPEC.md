@@ -159,7 +159,7 @@ B (or B's agent) can release a task at any time from Doing, To Review, QA Review
 The whole team sees the metrics, with names (section 11).
 
 ### UC10: Start side hustle
-B (any user, including owners) runs the `start-side-hustle` skill once. It turns side hustle mode on and starts a recurring cycle in B's open session that repeats every poll interval, with no further human action. In each cycle, for B, it does:
+B (any user, including owners) runs the `start-side-hustle` skill once. It turns side hustle mode on and starts a recurring cycle in B's open session that repeats every poll interval, with no further human action. In each cycle, for B, it always does the owner agent duties, and does the picker and reviewer duties only while side hustle mode is on and B is below the threshold (work already underway is finished or released per B's policy):
 - **Picker duties:** check side hustle mode, the threshold and max concurrency; claim eligible tasks (UC2); implement them with the heartbeat (UC3); release orphaned tasks (E6); deliver after the review passes (UC5).
 - **Reviewer duties:** review tasks in To Review (UC4), including tasks B implemented, always with a context independent of the implementer's (AC22).
 - **Owner agent duties for B's own tasks:** handle Needs Info, the reminder and stalled tasks (UC7); open and follow the Slack threads; copy replies into Asana; post the notices for transitions B made by hand.
@@ -325,7 +325,7 @@ The side hustle harness (these skills, the default harness and the shared config
 
 ### Start side hustle
 - **AC52:** GIVEN B runs `start-side-hustle` once, WHEN it starts, THEN side hustle mode is turned on and a recurring cycle runs in B's open session every poll interval with no further human action.
-- **AC53:** GIVEN the cycle is running, WHEN a cycle runs, THEN it performs B's picker duties, reviewer duties for tasks in To Review, including tasks B implemented (with a context independent of the implementer's), and owner agent duties for B's own tasks.
+- **AC53:** GIVEN the cycle is running, WHEN a cycle runs, THEN it always performs the owner agent duties for B's own tasks, and performs B's picker duties and reviewer duties for tasks in To Review, including tasks B implemented (with a context independent of the implementer's), only while side hustle mode is on and B is below the threshold; work already underway is finished or released per B's policy.
 - **AC54:** GIVEN the cycle is running, WHEN B turns side hustle mode off, THEN the cycle stops picking up and reviewing tasks by itself, and the owner agent duties keep running.
 - **AC55:** GIVEN the cycle is running, WHEN B crosses the threshold, THEN the current task is finished or released per B's policy, the cycle stops picking up and reviewing tasks by itself, and the owner agent duties keep running.
 - **AC56:** GIVEN B's session closes while the cycle is running, WHEN the heartbeat timeout expires, THEN B's tasks in Doing or To Review are released to Next by another agent (AC42), with no new mechanism.
