@@ -63,5 +63,10 @@ Side hustle task (template v1)
 - **Optional fields.** An empty value or `none` means "not set".
 - **Required fields.** A required field is **missing** if its section is absent, empty, `none`, or has a value outside the valid values above. A task with a missing required field is not eligible (SPEC.md E2, AC9).
 - **Token budget.** The budget is the first integer in the section.
-- **Instructions.** Everything an agent needs to know comes from this description and the task's comments (SPEC.md P1). Later clarifications are added as Asana comments, or by the owner editing the description in this format.
-- **Editing.** Agents other than the owner change only the `Last heartbeat` section. Its exact update rules belong to the skill that works on the task.
+- **Instructions.** Everything an agent needs to know comes from this description and the task's comments (SPEC.md P1). The description is the canonical value of each field.
+- **Editing.** Only these may edit the description:
+  - **The owner**, in this format.
+  - **The owner agent**, when it completes missing or corrected information (SPEC.md UC7, AC36). Before moving the task back to Open or clearing the "stalled" flag, it writes the resolved values, already recorded in Asana, into the affected sections. The source answer stays in Asana (a comment, or a reply copied from Slack).
+  - **The agent currently working on the task**, but only in the `Last heartbeat` section. Its exact update rules belong to the skill that works on the task.
+
+  No other agent edits the description.

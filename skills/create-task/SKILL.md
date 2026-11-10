@@ -62,8 +62,8 @@ The task is never published without a budget.
 ## 5. Open the Slack thread (UC1, AC8)
 
 Follow **"Open the thread" in `skills/slack/SKILL.md`**. You are the owner's agent, so you are the authorized thread creator. Do not create the thread any other way.
-- **If the thread cannot be posted right now:** the task still stands. The owner agent opens the thread the first time it sees the task with no thread (Slack skill).
-- **Afterwards:** tell the owner the task is published, with the Asana link and the thread link (or "thread pending").
+- **Publication is complete only when** the thread exists and its `Side hustle Slack thread:` comment is recorded in Asana. Then tell the owner the task is published, with the Asana link and the thread link.
+- **If the thread cannot be posted right now:** keep the task, and do not create a second task or let any other agent open the thread. Tell the owner the publication is **pending: thread not yet open**, with the Asana link. You, the owner's agent, retry asynchronously. On each later owner-agent cycle you find the task with no thread and open it through the Slack skill. The publication becomes complete once the permalink is recorded.
 
 ## Asana is the record (AC45)
 
