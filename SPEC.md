@@ -22,7 +22,7 @@ A **dashboard** shows team usage (tokens, models, tasks published, picked up and
 |---|---|
 | P1 | **Asana is the single source of truth** for instructions. Everything needed to continue a task lives in the Asana task (description and comments). Slack is for notifying and talking, never the only source of instructions. |
 | P2 | **Everything is asynchronous.** No agent waits on a human or another agent; while waiting, it keeps working on other tasks. |
-| P3 | **The workflow never blocks.** Any task can change assignee. Orphaned or stalled tasks are released automatically. |
+| P3 | **The workflow never blocks.** Any task can change assignee. Orphaned tasks are released automatically; stalled tasks are flagged. |
 | P4 | **The repository's harness wins.** Work is always executed under the target project's rules, never under rules that contradict them. |
 | P5 | **No deploy without human review.** |
 | P6 | **Only the owner** approves the deliverable and moves the task to Done. |
@@ -95,13 +95,13 @@ A **dashboard** shows team usage (tokens, models, tasks published, picked up and
 | Open/Next → Doing | Picker agent | Claim: assigns the task to itself and moves it |
 | Open/Next → Needs Info | Picker agent | Required fields are missing, ambiguous or contradict the repo harness |
 | Doing → To Review | Picker agent | Implementation finished |
-| To Review → Doing | Reviewer agent | A non-destructive check fails and attempts remain |
-| To Review → Needs Info | Reviewer agent | A destructive check fails, or attempts are exhausted |
+| To Review → Doing | Reviewer agent | A non-destructive failure is found and attempts remain |
+| To Review → Needs Info | Reviewer agent | A destructive failure is found (the non-destructive check fails), or attempts are exhausted |
 | To Review → QA Review | Reviewer agent | All checks pass; delivered and owner notified |
 | QA Review → Next | Owner | Rejection with an Asana comment on how to proceed |
 | QA Review → Done | Owner | Approval (and merge, final publication or deploy done by a human) |
-| Doing → Needs Info | Picker agent | Budget exhausted before reaching To Review |
-| Doing/To Review → Next | Picker agent / any agent | Voluntary release, threshold crossed with `release` policy, or orphaned task |
+| Doing → Needs Info | Picker agent | Budget exhausted before reaching To Review, or the task contradicts the repo harness |
+| Doing/To Review → Next | Picker / picker agent / any agent | Voluntary release, threshold crossed with `release` policy, or orphaned task |
 | Needs Info → Open | Owner agent / owner | Information completed in Asana |
 
 When a task moves to Open or Next, it is **unassigned**. The assignment is what locks it for everyone else.
@@ -234,7 +234,7 @@ The side hustle harness (these skills, the default harness and the shared config
 ### Configuration and eligibility
 - **AC1:** GIVEN B has side hustle mode off, WHEN a poll cycle runs, THEN B's agent neither looks for nor claims tasks.
 - **AC2:** GIVEN B has the mode on and consumption above the threshold, WHEN a poll cycle runs, THEN B's agent claims no tasks.
-- **AC3:** GIVEN B has the mode on and consumption below the threshold, WHEN there is an unassigned task in Open with all fields filled in and a budget that fits B's margin, THEN B's agent claims it without asking for confirmation.
+- **AC3:** GIVEN B has the mode on and consumption below the threshold, WHEN there is an unassigned task in Open with all required fields filled in and a budget that fits B's margin, THEN B's agent claims it without asking for confirmation.
 - **AC4:** GIVEN B has reached max concurrency, WHEN there are eligible tasks, THEN B's agent claims no more.
 - **AC5:** GIVEN a task's budget exceeds the margin B has left before the threshold, WHEN the agent evaluates it, THEN it does not claim it and keeps looking.
 - **AC6:** GIVEN a task with no budget but with an estimate, WHEN it is evaluated, THEN the default budget for that estimate is used.
@@ -242,7 +242,7 @@ The side hustle harness (these skills, the default harness and the shared config
 
 ### Publish
 - **AC8:** GIVEN A uses the create-task skill, WHEN it finishes, THEN the task exists in the Side Hustle project with all required fields, is in Open, and has a thread in the Slack channel.
-- **AC9:** GIVEN a task in Open is missing a required field, WHEN a picker agent evaluates it, THEN it does not claim it, comments in Asana on what is missing, mentions A in the Slack thread and moves it to Needs Info.
+- **AC9:** GIVEN a task in Open or Next is missing a required field, WHEN a picker agent evaluates it, THEN it does not claim it, comments in Asana on what is missing, mentions A in the Slack thread and moves it to Needs Info.
 
 ### Claim
 - **AC10:** GIVEN an agent claims a task, WHEN it does so, THEN the task is assigned to B, moves to Doing, and the Slack thread is notified.
@@ -263,9 +263,9 @@ The side hustle harness (these skills, the default harness and the shared config
 ### Review
 - **AC22:** GIVEN a task in To Review, WHEN the reviewer acts, THEN it is an agent with independent context that only sees the task and the deliverable.
 - **AC23:** GIVEN the reviewer reviews, WHEN it finishes, THEN it leaves a report in Asana with the result of the four checks (compliance, scope, non-destructive, harness).
-- **AC24:** GIVEN a non-destructive check fails and attempts remain, WHEN the reviewer finishes, THEN the task goes back to Doing with the report and the implementer fixes it.
+- **AC24:** GIVEN a non-destructive failure is found and attempts remain, WHEN the reviewer finishes, THEN the task goes back to Doing with the report and the implementer fixes it.
 - **AC25:** GIVEN the max attempts have been reached, WHEN it fails again, THEN the task moves to Needs Info with the report.
-- **AC26:** GIVEN the non-destructive check fails, WHEN the reviewer finishes, THEN the task moves to Needs Info with no retries.
+- **AC26:** GIVEN the non-destructive check fails (a destructive failure), WHEN the reviewer finishes, THEN the task moves to Needs Info with no retries.
 - **AC27:** GIVEN all checks pass, WHEN the reviewer finishes, THEN the delivery (UC5) happens and the task moves to QA Review.
 
 ### Deliver
