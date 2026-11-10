@@ -1,7 +1,7 @@
 # Side hustle per-user configuration (SPEC.md section 5).
 # start-side-hustle writes config/user.yaml (git-ignored) itself: it asks only for
 # your weekly pledge and uses the confirmed defaults below for everything else.
-# start-side-hustle is specified (SPEC.md UC10) but not yet implemented.
+# Run /start-side-hustle; do not edit config/user.yaml by hand.
 # Skills re-read config/user.yaml at the start of every poll cycle, so a change
 # applies from the next poll cycle with no restart.
 # Values marked "confirmed default" are the defaults confirmed by the owner.
