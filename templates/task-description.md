@@ -67,6 +67,7 @@ The option gids for Priority and Estimate are in `config/global.yaml`.
 - **Required fields.** A required field is **missing** if its section or custom field is absent, empty, `none`, or has a value outside the valid values above. A task with a missing required field is not eligible (SPEC.md E2, AC9).
 - **Budget.** Read the Budget custom field's `number_value` and multiply by 100 to get the % of the weekly limit (0.05 → 5%). Write it the same way (5% → 0.05).
 - **Instructions.** Everything an agent needs to know comes from this description, these custom fields and the task's comments (SPEC.md P1). The description and the custom fields hold the canonical value of each field.
+- **System task.** The ledger task (`usage.ledger_task` in `config/global.yaml`) is not a side hustle task. Every skill ignores it: no claim, review, fill-in, Slack thread, notice or recovery. Only usage reporting writes pledge records on it.
 - **Editing.** Only these may edit the description or the custom fields:
   - **The owner**, in this format.
   - **The owner agent**, when it completes missing or corrected information (SPEC.md UC7, AC36). Before moving the task back to Open or clearing the "stalled" flag, it writes the resolved values, already recorded in Asana, into the affected sections or custom fields. The source answer stays in Asana (a comment, or a reply copied from Slack).
@@ -89,4 +90,6 @@ Skills recognize their own Asana comments by a fixed first line. Each marker is 
 | `Side hustle review: PASS` or `Side hustle review: FAIL` | Reviewer agent (reviewer skill) | The review result and report (SPEC.md UC4, AC23). The second line is `Outcome: pass`, `retry (attempt <n> of <max>)`, `attempts exhausted` or `destructive`. Only the first result after the task last entered To Review is authoritative. Later results in that window are void. The reviewer applies the authoritative outcome, and the picker delivers only on an authoritative PASS. |
 | `Side hustle fill-in: <what> (source: <where>)` | Owner agent (fill-in skill) | A fact the owner agent filled in from its own context. |
 | `Side hustle asked: <question>` / `Side hustle reminder` | Owner agent (fill-in skill) | The owner was asked on Slack during this Needs Info stint, or got the single reminder (AC37). |
+| `Side hustle usage: <user> · <ISO week> · <cycle start>` | Any agent (usage-reporting skill) | Usage of one cycle on this task, one line per phase and model: tokens (measured or estimate), cost and % of the weekly limit (both estimates). |
+| `Side hustle pledge: <user> · <n>% · <ISO week>` | Any agent (usage-reporting skill), on the ledger task only | The user's pledge for that week. |
 | `Side hustle stalled` / `Side hustle stalled cleared` | Owner agent (fill-in skill) | The "stalled" flag. A task is flagged while its latest of these two comments is `Side hustle stalled`. |

@@ -52,8 +52,8 @@ Once a user runs `start-side-hustle`, the recurring cycle in that user's session
 | Poll interval | Time between two cycles of the user's side hustle loop (UC10). |
 
 **Pledge used this week:**
-- Until usage reporting exists, it is the sum of the budgets of the tasks the user claimed this week.
-- Once usage reporting exists, it is the user's actual consumption on side hustle tasks this week.
+- Until usage reporting measures actual consumption, it is the sum of the budgets of the tasks the user claimed this week.
+- Once usage reporting measures it, it is the user's actual consumption on side hustle tasks this week.
 
 The **pledge left** is the pledge minus the pledge used.
 

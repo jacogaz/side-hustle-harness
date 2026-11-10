@@ -60,7 +60,7 @@ For each task assigned to B:
   - when the **authoritative** review result is `PASS`, deliver it (step 5). That result is the first `Side hustle review:` comment after the task last entered To Review; later ones are void. Read the task again just before delivering to confirm this.
 - **Anything else**, such as QA Review or Needs Info: nothing to do, move on.
 
-**Pledge used up mid-task (E5, AC19, AC20)** applies only once usage reporting measures actual usage. Until then, a claimed task's budget is reserved for the whole task, so work underway is never stopped for pledge reasons. Once actual usage is measured, a task whose usage exhausts B's pledge is handled per `on_pledge_used_up`:
+**Pledge used up mid-task (E5, AC19, AC20)** applies only once usage reporting gives a measured (not estimated) % of the weekly limit. Until then, a claimed task's budget is reserved for the whole task, so work underway is never stopped for pledge reasons. Once actual usage is measured, a task whose usage exhausts B's pledge is handled per `on_pledge_used_up`:
 - `finish`: complete it and claim nothing more;
 - `release`: release it (see "Release a task").
 
@@ -72,8 +72,8 @@ Skip this step unless **both** are true:
 
 Compute the pledge figures for the current ISO week:
 - **Pledge used** (SPEC.md §5), in percentage points of the weekly limit:
-  - **Until usage reporting exists:** the sum of the `<n>` in B's `Side hustle claim:` records for this ISO week. B writes a record only after confirming it is the assignee (see "To claim"), so these are the budgets of the tasks B was assigned this week.
-  - **Once usage reporting exists:** B's actual consumption on side hustle tasks this week, as published by the usage reporting skill. That skill defines the source; this skill only reads it. Reviews are attributed as the spec says: they are inside the task's budget and never charged to the reviewer's pledge.
+  - **Until usage reporting gives a measured % of the weekly limit:** the sum of the `<n>` in B's `Side hustle claim:` records for this ISO week. B writes a record only after confirming it is the assignee (see "To claim"), so these are the budgets of the tasks B was assigned this week.
+  - **Once it does:** B's actual consumption on side hustle tasks this week, as published by the usage reporting skill. That skill defines the source; this skill only reads it. Reviews are attributed as the spec says: they are inside the task's budget and never charged to the reviewer's pledge.
 - **Pledge left:** `pledge_percent` minus pledge used.
 - **Active claims:** B's tasks in Doing or To Review. Stop claiming once their number reaches `max_concurrency` (AC4).
 
@@ -119,7 +119,7 @@ Claiming your own task is allowed (E15).
    - move the task to Needs Info;
    - post the Needs Info notice.
 5. **Heartbeat (AC16):** set `Last heartbeat` to now after each significant step, and never let more than `poll_interval_minutes` pass without updating it while you work.
-6. **Budget runs out (AC18, E7):** if the task cannot be finished within its Budget (your best judgement until usage reporting measures it):
+6. **Budget runs out (AC18, E7):** if the task cannot be finished within its Budget (your best judgement; the usage reports on the task help):
    - stop;
    - save the state (see "Save the state");
    - move the task to Needs Info;
