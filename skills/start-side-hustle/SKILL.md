@@ -29,40 +29,35 @@ Then set:
 
 ### 3. Start the cycle once (one active cycle per user)
 
-**Two things:**
-- **The lock.** `config/.cycle.lock` names the **owner session**, the one session whose cycle is active. It holds `session_id` and `alive_at`. The owner refreshes `alive_at` at least every `poll_interval_minutes`, also during long work (see "One cycle").
-- **The session's job.** Every session that ran `/start-side-hustle` has exactly **one** recurring Claude Code scheduled job, created with `/loop` at `poll_interval_minutes`. The job runs "One cycle" below. A session that is not the owner only checks the lock on each run (standby). This way, a session takes over automatically when the owner's session is gone.
+The lock `config/.cycle.lock` names the **owner session**, the one session whose cycle is active. It holds `session_id` and `alive_at`. The owner refreshes `alive_at` at least every `poll_interval_minutes`, also during long work (see "One cycle"). The lock is **live** while `alive_at` is younger than 2 × `poll_interval_minutes`, and **stale** otherwise.
 
 **Steps:**
-1. **Look for this session's job** in its scheduled tasks. If there is none, create it, for example:
-   ```
-   /loop 15m run one side hustle cycle (skills/start-side-hustle/SKILL.md, "One cycle")
-   ```
-   Never create a second job in the same session.
-2. **If this session is already the lock owner:** the cycle is active (AC57, E20). Only the pledge and the mode changed, and the next run reads them.
-3. **Otherwise,** run "One cycle" now. Its first step decides from the lock whether this session takes over or stays on standby.
+1. **The lock is live,** whichever session owns it: the cycle is active (AC57, E20). Only the pledge and the mode changed, and the next run reads them. Schedule nothing.
+2. **No lock, or a stale one:** start a fresh cycle in this session.
+   1. Write this session as owner, with `alive_at` = now.
+   2. Read the lock again. If another session wrote it in between, treat the lock as live (step 1).
+   3. Create this session's recurring Claude Code job with `/loop` at `poll_interval_minutes`, unless this session already has one, for example:
+      ```
+      /loop 15m run one side hustle cycle (skills/start-side-hustle/SKILL.md, "One cycle")
+      ```
+   4. Run the first cycle right away.
+
+   The old cycle, if its session ever resumes, stops itself through the ownership check in "One cycle".
 
 Tell B in one line:
 - the pledge, and whether side hustle mode is on;
 - that the cycle runs every `poll_interval_minutes` while this session stays open;
-- that closing the session stops it, unless another of B's open sessions that ran `/start-side-hustle` takes over; and that the heartbeat timeout then recovers B's tasks (E18, AC56).
+- that closing the session stops it, and that the heartbeat timeout then recovers B's tasks (E18, AC56); running `/start-side-hustle` again later starts a fresh cycle.
 
 ## One cycle
 
 Run these steps in order, once, then return. Never wait on a person or another agent (AC40).
 
 1. **Ownership (fencing):** read `config/.cycle.lock`.
-   - **This session is the owner:** go on.
-   - **Another session is the owner and its `alive_at` is younger than 2 × `poll_interval_minutes`:** stay on standby. Do nothing else in this run.
-   - **No lock, or a stale one:** take over.
-     1. Write this session as owner, with `alive_at` = now.
-     2. Read the lock again.
-     3. If another session wrote it in between, stay on standby.
+   - **This session is the owner:** set `alive_at` = now and go on.
+   - **Otherwise:** this cycle was replaced. Delete this session's side hustle job and stop. A replaced cycle never continues.
 
-   **Before each later step, and at least every `poll_interval_minutes` during long work** (for example each time pick-up updates a task heartbeat):
-   - read the lock again;
-   - if this session is still the owner, set `alive_at` = now and go on;
-   - if not, this cycle was replaced: stop at once and stay on standby. A replaced cycle never continues.
+   Repeat this check before each later step, and at least every `poll_interval_minutes` during long work (for example each time pick-up updates a task heartbeat).
 2. **Housekeeping:**
    - Re-read `config/global.yaml` and `config/user.yaml` (AC7).
    - **Job renewal:** Claude Code scheduled jobs expire 7 days after creation. If this session's job was created more than 6 days ago, create the replacement `/loop` job first, then delete the old one. The session always keeps exactly one job.

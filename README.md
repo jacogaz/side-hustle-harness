@@ -27,7 +27,7 @@ This repo is installed by every team member. Target repos, where tasks are imple
 That's all.
 - **What it does:** it writes `config/user.yaml` for you, with the confirmed defaults for everything else, and starts the side hustle cycle in your open session every 15 minutes. Nobody copies or edits the file by hand.
 - **To change your pledge:** run `/start-side-hustle` again. It never starts a second cycle.
-- **To stop:** close the session (and any other session where you ran it). Your tasks are then recovered by the heartbeat timeout.
+- **To stop:** close the session. Your tasks are then recovered by the heartbeat timeout. Run `/start-side-hustle` again to start a fresh cycle.
 
 ## Configuration reference
 
