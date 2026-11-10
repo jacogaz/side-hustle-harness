@@ -10,8 +10,9 @@ This repo is installed by every team member. Target repos, where tasks are imple
 |---|---|---|
 | `config/global.yaml` | Global configuration, shared by the team. | §6 |
 | `config/user.example.yaml` | Template for per-user configuration. | §5 |
-| `config/user.yaml` | Your own per-user configuration (git-ignored). Written by `start-side-hustle` (specified in SPEC.md UC10, not yet implemented). | §5 |
+| `config/user.yaml` | Your own per-user configuration (git-ignored). Written by `/start-side-hustle`. | §5 |
 | `harness/DEFAULT_HARNESS.md` | Default harness, applied when a target repo has none. | E4, AC14 |
+| `skills/start-side-hustle/SKILL.md` | The single trigger: one pledge question, writes `config/user.yaml`, starts the recurring cycle that runs the other skills. | §12, UC10, AC52–AC58 |
 | `skills/slack/SKILL.md` | Slack skill: one thread per task, transition notices, mentions, reading replies. | §12, UC1, AC44 |
 | `skills/create-task/SKILL.md` | Create-task skill: publishes a task with the full template, a budget and a Slack thread. | §12, UC1, AC6, AC8 |
 | `skills/reviewer/SKILL.md` | Reviewer skill: one cycle step that reviews tasks in To Review with the four UC4 checks in an independent context. | §12, UC4, AC22–AC27 |
@@ -21,9 +22,13 @@ This repo is installed by every team member. Target repos, where tasks are imple
 ## Setup (each team member)
 
 1. Clone or install this repo.
-2. Run `start-side-hustle`. It asks one question, how much of your weekly Claude usage to pledge (a %), and writes `config/user.yaml` for you with the confirmed defaults for everything else. Nobody copies or edits the file by hand. Run it again to change your pledge; side hustle mode follows it. A change applies from your agent's next poll cycle.
+2. In Claude Code, run `/start-side-hustle` and answer its one question: how much of your weekly Claude usage to pledge (a %; 0 = only follow up on your own tasks).
 
-`start-side-hustle` is specified (SPEC.md UC10) but not yet implemented.
+That's all.
+- **What it does:** it writes `config/user.yaml` for you, with the confirmed defaults for everything else, and starts the side hustle cycle in your open session every 15 minutes. Nobody copies or edits the file by hand.
+- **To change your pledge:** run `/start-side-hustle` again. It never starts a second cycle.
+- **To stop:** close the session. Your tasks are then recovered by the heartbeat timeout. Run `/start-side-hustle` again to start a fresh cycle.
+- **Known PoC limitation:** if you close a session and run `/start-side-hustle` in a new one within two poll intervals (about 30 minutes), the old cycle still looks alive. Only your pledge is updated, and no cycle is started. The skill tells you when to run it again, which is once the old check-in is stale.
 
 ## Configuration reference
 
