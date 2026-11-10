@@ -28,6 +28,7 @@ That's all.
 - **What it does:** it writes `config/user.yaml` for you, with the confirmed defaults for everything else, and starts the side hustle cycle in your open session every 15 minutes. Nobody copies or edits the file by hand.
 - **To change your pledge:** run `/start-side-hustle` again. It never starts a second cycle.
 - **To stop:** close the session. Your tasks are then recovered by the heartbeat timeout. Run `/start-side-hustle` again to start a fresh cycle.
+- **Known PoC limitation:** if you close a session and run `/start-side-hustle` in a new one within two poll intervals (about 30 minutes), the old cycle still looks alive. Only your pledge is updated, and no cycle is started. The skill tells you when to run it again, which is once the old check-in is stale.
 
 ## Configuration reference
 

@@ -33,6 +33,8 @@ The lock `config/.cycle.lock` names the **owner session**, the one session whose
 
 **Steps:**
 1. **The lock is live,** whichever session owns it: the cycle is active (AC57, E20). Only the pledge and the mode changed, and the next run reads them. Schedule nothing.
+
+   If the owner is **another session**, tell B once, plainly: "A side hustle cycle in another session checked in <N> minutes ago. If you closed that session, run /start-side-hustle again after <HH:MM>." `<HH:MM>` is when the lock becomes stale: `alive_at` + 2 × `poll_interval_minutes`.
 2. **No lock, or a stale one:** start a fresh cycle in this session.
    1. Write this session as owner, with `alive_at` = now.
    2. Read the lock again. If another session wrote it in between, treat the lock as live (step 1).
