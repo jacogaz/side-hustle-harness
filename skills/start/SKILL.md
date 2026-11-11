@@ -36,7 +36,8 @@ Then set:
 The lock `${CLAUDE_PLUGIN_DATA}/cycle.lock` names the **owner session**, the one session whose cycle is active. It holds `session_id` and `alive_at`. The owner refreshes `alive_at` at least every `poll_interval_minutes`, also during long work (see "One cycle"). The lock is **live** while `alive_at` is younger than 2 × `poll_interval_minutes`, and **stale** otherwise.
 
 **Steps:**
-1. **The lock is live,** whichever session owns it: the cycle is active (AC57, E20). Only the pledge and the mode changed, and the next run reads them. Schedule nothing.
+0. **Old job.** Delete any recurring job in this session's scheduled tasks that calls `/side-hustle:start-side-hustle`, the old name of this skill.
+1. **The lock is live,** whichever session owns it: the cycle is active (AC57, E20). Only the pledge and the mode changed, and the next run reads them. Schedule nothing, with one exception: if this session is the owner and has no `/side-hustle:start cycle` job (for example because step 0 removed the old one), create it as in step 2.3.
 
    If the owner is **another session**, tell B once, plainly: "A side hustle cycle in another session checked in <N> minutes ago. If you closed that session, run /side-hustle:start again after <HH:MM>." `<HH:MM>` is when the lock becomes stale: `alive_at` + 2 × `poll_interval_minutes`.
 2. **No lock, or a stale one:** start a fresh cycle in this session.
