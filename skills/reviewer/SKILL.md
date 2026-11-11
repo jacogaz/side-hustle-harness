@@ -66,6 +66,7 @@ Give that context only the following.
   - Code: the branch `side-hustle/<task gid>` of the target GitHub repo against its base. There is no pull request yet; the picker opens it at delivery;
   - Documentation: the Confluence draft;
   - Asana tasks: the proposed tasks.
+- **The rules to check against:** the project agent rules (the `## Agent rules` section of the project description), the target repo's harness, and `default_harness`, so the context can apply the precedence in check 4. They come from the project and the repo, not from the implementer.
 
 Use only the location from the state comment; ignore any explanation or reasoning the implementer wrote there. Do not give the context the implementer's session, its notes or reasoning, or any Slack messages.
 
