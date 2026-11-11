@@ -8,6 +8,7 @@ description: One cycle step of a user's side hustle loop. It independently revie
 This skill does **R's reviewer duties** for one cycle (SPEC.md UC4, UC10, E9, E10, E21, AC22–AC27). R is the user whose session runs it. It runs one pass and returns, and it never waits on anyone (AC40).
 
 It uses:
+- **The project agent rules (`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`, "Project agent rules")**, read at the start of every run and applied;
 - **`${CLAUDE_PLUGIN_ROOT}/config/global.yaml`** for the section and custom field gids, `max_reviewer_attempts`, `heartbeat_timeout_hours` and `default_harness`;
 - **`${CLAUDE_PLUGIN_DATA}/user.yaml`** for R's side hustle mode and `poll_interval_minutes`;
 - **`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`** for task fields and comment markers;
@@ -65,6 +66,7 @@ Give that context only the following.
   - Code: the branch `side-hustle/<task gid>` of the target GitHub repo against its base. There is no pull request yet; the picker opens it at delivery;
   - Documentation: the Confluence draft;
   - Asana tasks: the proposed tasks.
+- **The rules to check against:** the project agent rules (the `## Agent rules` section of the project description), the target repo's harness, and `default_harness`, so the context can apply the precedence in check 4. They come from the project and the repo, not from the implementer.
 
 Use only the location from the state comment; ignore any explanation or reasoning the implementer wrote there. Do not give the context the implementer's session, its notes or reasoning, or any Slack messages.
 
@@ -82,7 +84,7 @@ For code, check out the branch in a clean workspace of your own, and never push 
    - no removal of files, tests or functionality that the task did not explicitly request.
 
    The first four have no exception. A requested removal never excuses any of them.
-4. **Harness:** the **effective harness** passes: the target repo's harness (tests, lint, conventions) when it has one, otherwise `default_harness`. If the default harness applies, the deliverable must say so (AC14).
+4. **Harness:** the **effective harness** passes: the target repo's harness (tests, lint, conventions) when it has one, then the project agent rules, then `default_harness`, in that order of precedence. If the default harness applies, the deliverable must say so (AC14).
 
 **Failure classes:**
 - If check 3 fails, the failure is **destructive**.

@@ -8,6 +8,7 @@ description: One cycle step of a user's side hustle loop. It recovers orphaned t
 This skill does **B's picker duties** for one cycle (SPEC.md UC2, UC3, UC5, UC8, UC10). B is the user whose session runs it. The start skill (`/side-hustle:start`) calls it every cycle; this skill runs one pass and returns. It never waits on a person or another agent (AC40): anything that has to wait is left for a later cycle, and the step moves on.
 
 It uses:
+- **The project agent rules (`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`, "Project agent rules")**, read at the start of every run and applied;
 - **`${CLAUDE_PLUGIN_ROOT}/config/global.yaml`** for the section, custom field and option gids, `heartbeat_timeout_hours`, `default_harness` and `slack_channel`;
 - **`${CLAUDE_PLUGIN_DATA}/user.yaml`** for B's pledge, mode, max concurrency, `on_pledge_used_up` and `poll_interval_minutes`;
 - **`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`** to read task fields and comment markers;
@@ -83,6 +84,8 @@ Look at tasks in **Open** and **Next** (Next is claimable like Open, AC12). A ta
 3. every required field is present and valid (template parsing rules);
 4. its Budget fits in B's pledge left (AC3, AC5); a task that does not fit is skipped, and you keep looking (E8).
 
+When several tasks are eligible, try them in the order the project agent rules give. The current rule 3: highest Priority first (High, Medium, Low, then empty), ties by the oldest task. Without such a rule, the order is free.
+
 **A required field is missing or invalid (AC9, E2):**
 - do not claim the task;
 - comment in Asana on exactly what is missing;
@@ -112,7 +115,7 @@ Claiming your own task is allowed (E15).
    - **Documentation:** a Confluence draft that is not published.
    - **Asana tasks:** a list of the proposed tasks, kept in a `Side hustle state:` comment. Do not create the tasks yet.
 3. **Harness:** follow the target repo's harness (CLAUDE.md/AGENTS.md, skills, commands, hooks, tests, lint, conventions), even where it contradicts B's personal configuration (AC13). If the repo has none, apply `default_harness` and say so in the deliverable (AC14).
-4. **Contradictions (AC15, E3):** check the task against the **effective harness**: the target repo's harness when it has one, otherwise `default_harness`. The scope, non-destructive and no-deploy rules of SPEC.md (UC4, P5) always apply in addition. If the task asks for something that contradicts them:
+4. **Contradictions (AC15, E3):** check the task against the **effective harness**: the target repo's harness when it has one, then the project agent rules, then `default_harness`, in that order of precedence. The scope, non-destructive and no-deploy rules of SPEC.md (UC4, P5) always apply in addition. If the task asks for something that contradicts them:
    - do not do it;
    - comment in Asana on the contradiction;
    - save the state (see "Save the state");

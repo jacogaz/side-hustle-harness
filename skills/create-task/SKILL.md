@@ -20,6 +20,8 @@ Read `${CLAUDE_PLUGIN_ROOT}/config/global.yaml`. You need:
 - `default_budget_per_size` (% of the weekly limit: S 2, M 5, L 10);
 - `slack_channel`.
 
+Also read the project agent rules (`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`, "Project agent rules"), and apply them, for example the language of the task.
+
 ## 2. Collect every template field
 
 Go through the fields of `${CLAUDE_PLUGIN_ROOT}/templates/task-description.md` in order. Ask the owner only for what they have not already given, and keep it short.

@@ -67,6 +67,7 @@ Run these steps in order, once, then return. Never wait on a person or another a
    Repeat this check before each later step, and at least every `poll_interval_minutes` during long work (for example each time pick-up updates a task heartbeat).
 2. **Housekeeping:**
    - Re-read `${CLAUDE_PLUGIN_ROOT}/config/global.yaml` and `${CLAUDE_PLUGIN_DATA}/user.yaml` (AC7).
+   - Read the project agent rules (`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`, "Project agent rules"). The skills this cycle runs apply them. If the section is missing or unreadable, say so once in the session and continue with the default harness.
    - **Job renewal:** Claude Code scheduled jobs expire 7 days after creation. If this session's job was created more than 6 days ago, create the replacement `/loop` job first, then delete the old one. The session always keeps exactly one job.
    - **New week (E22, AC58):** if `pledge_week` is not the current ISO week, keep `pledge_percent`, set `pledge_week` to the current week, and say once in the session: "New week: keeping your side hustle pledge of <n>%." Do not wait for an answer.
 3. **Owner agent duties for B's own tasks (always, AC53).** These are the tasks B created, never the ledger task (`usage.ledger_task`). Use `${CLAUDE_PLUGIN_ROOT}/skills/slack/SKILL.md`:

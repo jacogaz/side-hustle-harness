@@ -11,7 +11,7 @@ Slack is for notifying and talking. **Asana is the single source of truth** (SPE
 
 ## Channel
 
-Read `slack_channel` (`name`, `id`) from `${CLAUDE_PLUGIN_ROOT}/config/global.yaml` every time you use this skill. Post only in that channel. Never use direct messages or other channels; all communication about a task goes to its thread (SPEC.md §15).
+Read `slack_channel` (`name`, `id`) from `${CLAUDE_PLUGIN_ROOT}/config/global.yaml` every time you use this skill, together with the project agent rules (`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`, "Project agent rules"), for example the language of messages. Post only in that channel. Never use direct messages or other channels; all communication about a task goes to its thread (SPEC.md §15).
 
 ## Find a task's thread (any agent, no prior context)
 

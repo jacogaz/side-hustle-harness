@@ -8,6 +8,7 @@ description: One owner-duty cycle step. It unblocks the owner's own tasks in Nee
 This skill does the rest of **A's owner agent duties** for one cycle (SPEC.md UC7, E12, E13, AC36–AC39). A is the user whose session runs it. It acts only on **A's own tasks**, the tasks A created; never on other owners' tasks. It runs one pass, never waits on anyone (AC40), and runs whatever A's side hustle mode or pledge is.
 
 It uses:
+- **The project agent rules (`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`, "Project agent rules")**, read at the start of every run and applied;
 - **`${CLAUDE_PLUGIN_ROOT}/config/global.yaml`** for the section and custom field gids, and `needs_info_timeout_hours`;
 - **`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`** for the fields, the editing rules and the comment markers;
 - **`${CLAUDE_PLUGIN_ROOT}/skills/slack/SKILL.md`** for questions, the reminder and notices.
