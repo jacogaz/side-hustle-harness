@@ -1,4 +1,1 @@
-# Per-user configuration: each team member keeps their own copy.
-config/user.yaml
-# Marks the user's active side hustle cycle (start-side-hustle).
-config/.cycle.lock
+# Per-user state lives outside the repo, in ${CLAUDE_PLUGIN_DATA} (see README).

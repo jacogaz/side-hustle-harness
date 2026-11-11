@@ -1,9 +1,9 @@
 ---
-name: side-hustle-dashboard
+name: dashboard
 description: Show the Side Hustle dashboard. It reads the Side Hustle Asana project and renders the usage, flow, quality, people and optimization blocks with names, plus informational insights. Read-only. Use when anyone on the team asks for the side hustle dashboard or metrics.
 ---
 
-# Side Hustle dashboard (`/side-hustle-dashboard`)
+# Side Hustle dashboard (`/side-hustle:dashboard`)
 
 Any team member runs this skill to see the dashboard (SPEC.md §11, AC46–AC51). It reads Asana and renders the result in the Claude session, with names. There is no server and no database.
 
@@ -11,8 +11,8 @@ Any team member runs this skill to see the dashboard (SPEC.md §11, AC46–AC51)
 
 ## Inputs
 
-- **`config/global.yaml`:** `asana_project` (project, sections and custom fields), `usage.ledger_task`, `heartbeat_timeout_hours` and `default_budget_per_size`.
-- **Every task in the project except the ledger task:** read its name, creator, assignee, section and assignment history, custom fields (Budget, Estimate, Last heartbeat) and comments. The markers are defined in `templates/task-description.md`.
+- **`${CLAUDE_PLUGIN_ROOT}/config/global.yaml`:** `asana_project` (project, sections and custom fields), `usage.ledger_task`, `heartbeat_timeout_hours` and `default_budget_per_size`.
+- **Every task in the project except the ledger task:** read its name, creator, assignee, section and assignment history, custom fields (Budget, Estimate, Last heartbeat) and comments. The markers are defined in `${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`.
 - **The ledger task:** read only its `Side hustle pledge:` comments.
 - **Week:** the current ISO week by default. The user may name another week.
 - **People:** shown by their Asana names.
@@ -56,7 +56,7 @@ A leaderboard, all time and this week:
 - **Completed tasks:** for each Done task, show these, all as % of the weekly limit:
   - actual: the sum of the `~<pct>%` in all its usage lines, all users and phases;
   - Budget, and actual minus Budget;
-  - the Estimate as its size (S/M/L) **and** its baseline, which is `default_budget_per_size` for that size in `config/global.yaml`, labelled "estimate baseline"; also actual minus that baseline;
+  - the Estimate as its size (S/M/L) **and** its baseline, which is `default_budget_per_size` for that size in `${CLAUDE_PLUGIN_ROOT}/config/global.yaml`, labelled "estimate baseline"; also actual minus that baseline;
   - for a task with no Estimate, show `none` with no baseline. Never treat the Budget as the Estimate.
 - **Per model:** the cost, and the success rate. The success rate is the % of tasks whose implementation used that model and were approved by the owner on the first pass.
 - **Bottlenecks:** the average time in, and current count of, Needs Info and QA Review.

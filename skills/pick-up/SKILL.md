@@ -1,5 +1,5 @@
 ---
-name: side-hustle-pick-up
+name: pick-up
 description: One cycle step of a user's side hustle loop. It recovers orphaned tasks, claims eligible tasks, implements them, delivers after the review passes, and releases tasks when needed. start-side-hustle calls it every poll interval; it does not loop by itself.
 ---
 
@@ -8,12 +8,12 @@ description: One cycle step of a user's side hustle loop. It recovers orphaned t
 This skill does **B's picker duties** for one cycle (SPEC.md UC2, UC3, UC5, UC8, UC10). B is the user whose session runs it. `start-side-hustle` calls it every cycle; this skill runs one pass and returns. It never waits on a person or another agent (AC40): anything that has to wait is left for a later cycle, and the step moves on.
 
 It uses:
-- **`config/global.yaml`** for the section, custom field and option gids, `heartbeat_timeout_hours`, `default_harness` and `slack_channel`;
-- **`config/user.yaml`** for B's pledge, mode, max concurrency, `on_pledge_used_up` and `poll_interval_minutes`;
-- **`templates/task-description.md`** to read task fields and comment markers;
-- **`skills/slack/SKILL.md`** for every Slack notice: find the thread, then post the reply for the transition.
+- **`${CLAUDE_PLUGIN_ROOT}/config/global.yaml`** for the section, custom field and option gids, `heartbeat_timeout_hours`, `default_harness` and `slack_channel`;
+- **`${CLAUDE_PLUGIN_DATA}/user.yaml`** for B's pledge, mode, max concurrency, `on_pledge_used_up` and `poll_interval_minutes`;
+- **`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`** to read task fields and comment markers;
+- **`${CLAUDE_PLUGIN_ROOT}/skills/slack/SKILL.md`** for every Slack notice: find the thread, then post the reply for the transition.
 
-Re-read both config files at the start of every cycle (AC7). If `config/user.yaml` is missing, treat side hustle mode as off.
+Re-read both config files at the start of every cycle (AC7). If `${CLAUDE_PLUGIN_DATA}/user.yaml` is missing, treat side hustle mode as off.
 
 **Never move a task to Done (AC34) and never deploy (AC32).**
 

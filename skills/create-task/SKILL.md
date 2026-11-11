@@ -1,12 +1,12 @@
 ---
-name: side-hustle-create-task
+name: create-task
 description: Publish a side hustle task in Asana with the full template, a budget and a Slack thread. Use when an owner wants to hand off a task to the side hustle team.
 ---
 
 # Create task skill (side hustle)
 
 The owner, or the owner's agent on their behalf, uses this skill to publish a task in the Side Hustle Asana project (SPEC.md UC1). The task:
-- has every template field (`templates/task-description.md`);
+- has every template field (`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`);
 - always has a budget, as % of the weekly Claude usage limit;
 - is unassigned and in Open;
 - has its own Slack thread.
@@ -15,14 +15,14 @@ The person running this skill is the task's **owner** (User A).
 
 ## 1. Read the configuration
 
-Read `config/global.yaml`. You need:
+Read `${CLAUDE_PLUGIN_ROOT}/config/global.yaml`. You need:
 - `asana_project`: the project gid, the gid of its Open section, and the custom field and option gids;
 - `default_budget_per_size` (% of the weekly limit: S 2, M 5, L 10);
 - `slack_channel`.
 
 ## 2. Collect every template field
 
-Go through the fields of `templates/task-description.md` in order. Ask the owner only for what they have not already given, and keep it short.
+Go through the fields of `${CLAUDE_PLUGIN_ROOT}/templates/task-description.md` in order. Ask the owner only for what they have not already given, and keep it short.
 - **Task name:** a short title for the Asana task. Propose one from the goal and let the owner change it.
 - **Goal** (required).
 - **Deliverable type** (required): `Code`, `Documentation` or `Asana tasks`.
@@ -49,7 +49,7 @@ The task is never published without a budget.
 
 ## 4. Confirm and publish
 
-1. Write the description exactly in the format of `templates/task-description.md`.
+1. Write the description exactly in the format of `${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`.
 2. Show the owner the task name, the description, and the Priority, Estimate and Budget values once. Publish when they confirm.
 3. Create the task in the `asana_project`, in the `open` section, with **no assignee**:
    - the name is the task name and the description is the template text;
@@ -66,7 +66,7 @@ The task is never published without a budget.
 
 ## 5. Open the Slack thread (UC1, AC8)
 
-Follow **"Open the thread" in `skills/slack/SKILL.md`**. You are the owner's agent, so you are the authorized thread creator. Do not create the thread any other way.
+Follow **"Open the thread" in `${CLAUDE_PLUGIN_ROOT}/skills/slack/SKILL.md`**. You are the owner's agent, so you are the authorized thread creator. Do not create the thread any other way.
 - **Publication is complete only when** the thread exists and its `Side hustle Slack thread:` comment is recorded in Asana. Then tell the owner the task is published, with the Asana link and the thread link.
 - **If the thread cannot be posted right now:** keep the task, and do not create a second task or let any other agent open the thread. Tell the owner the publication is **pending: thread not yet open**, with the Asana link. You, the owner's agent, retry asynchronously. On each later owner-agent cycle you find the task with no thread and open it through the Slack skill. The publication becomes complete once the permalink is recorded.
 

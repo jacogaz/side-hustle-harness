@@ -1,5 +1,5 @@
 ---
-name: side-hustle-slack
+name: slack
 description: Post in a side hustle task's Slack thread, mention people and read replies. Use whenever a side hustle task is published, changes section, or the owner agent needs the replies in a task's thread.
 ---
 
@@ -11,7 +11,7 @@ Slack is for notifying and talking. **Asana is the single source of truth** (SPE
 
 ## Channel
 
-Read `slack_channel` (`name`, `id`) from `config/global.yaml` every time you use this skill. Post only in that channel. Never use direct messages or other channels; all communication about a task goes to its thread (SPEC.md §15).
+Read `slack_channel` (`name`, `id`) from `${CLAUDE_PLUGIN_ROOT}/config/global.yaml` every time you use this skill. Post only in that channel. Never use direct messages or other channels; all communication about a task goes to its thread (SPEC.md §15).
 
 ## Find a task's thread (any agent, no prior context)
 
