@@ -1,8 +1,8 @@
 # Side hustle per-user configuration (SPEC.md section 5).
-# Template. start-side-hustle writes your copy itself to ${CLAUDE_PLUGIN_DATA}/user.yaml
+# Template. /side-hustle:start writes your copy itself to ${CLAUDE_PLUGIN_DATA}/user.yaml
 # (outside the plugin, e.g. ~/.claude/plugins/data/side-hustle-side-hustle-harness/user.yaml):
 # it asks only for your weekly pledge and uses the confirmed defaults below for the rest.
-# Run /side-hustle:start-side-hustle; do not edit your user.yaml by hand.
+# Run /side-hustle:start; do not edit your user.yaml by hand.
 # Skills re-read your user.yaml at the start of every poll cycle, so a change
 # applies from the next poll cycle with no restart.
 # Values marked "confirmed default" are the defaults confirmed by the owner.
@@ -13,10 +13,10 @@ pledge_percent: 0
 
 # Week the pledge applies to: the calendar week (ISO week, Monday to Sunday,
 # e.g. 2026-W46), the same for the whole team. At the start of a new week,
-# start-side-hustle's cycle keeps last week's pledge and updates this.
+# the start skill's cycle keeps last week's pledge and updates this.
 pledge_week: ""
 
-# On when pledge_percent is above 0, off at 0 (start-side-hustle keeps it in sync). While off, your agent neither
+# On when pledge_percent is above 0, off at 0 (/side-hustle:start keeps it in sync). While off, your agent neither
 # picks up nor reviews tasks; owner agent duties still run.
 side_hustle_mode: false
 
@@ -30,5 +30,5 @@ max_concurrency: 1                  # confirmed default
 on_pledge_used_up: finish           # confirmed default
 
 # Minutes between two cycles of your side hustle loop, started once with
-# start-side-hustle (SPEC.md UC10).
+# /side-hustle:start (SPEC.md UC10).
 poll_interval_minutes: 15           # confirmed default

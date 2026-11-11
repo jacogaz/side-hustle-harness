@@ -1,6 +1,6 @@
 ---
 name: fill-in
-description: One owner-duty cycle step. It unblocks the owner's own tasks in Needs Info (fill in from context or ask the owner, reopen once the information is in Asana), sends the single reminder, flags and releases stalled tasks, and clears the stalled flag once the information is complete. start-side-hustle calls it; it does not loop by itself.
+description: One owner-duty cycle step. It unblocks the owner's own tasks in Needs Info (fill in from context or ask the owner, reopen once the information is in Asana), sends the single reminder, flags and releases stalled tasks, and clears the stalled flag once the information is complete. The start skill calls it; it does not loop by itself.
 ---
 
 # Fill-in skill (side hustle, owner agent)
@@ -12,7 +12,7 @@ It uses:
 - **`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`** for the fields, the editing rules and the comment markers;
 - **`${CLAUDE_PLUGIN_ROOT}/skills/slack/SKILL.md`** for questions, the reminder and notices.
 
-`start-side-hustle` runs the Slack skill's owner duties first, so owner replies given only on Slack are already copied into Asana as `From Slack (<owner>, <permalink>):` comments (AC39, E13).
+The start skill (`/side-hustle:start`) runs the Slack skill's owner duties first, so owner replies given only on Slack are already copied into Asana as `From Slack (<owner>, <permalink>):` comments (AC39, E13).
 
 ## What counts
 

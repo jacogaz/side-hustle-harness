@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: One cycle step of a user's side hustle loop. It independently reviews tasks in To Review with the four checks of UC4, records the result in Asana, and moves the task on. start-side-hustle calls it every poll interval; it does not loop by itself.
+description: One cycle step of a user's side hustle loop. It independently reviews tasks in To Review with the four checks of UC4, records the result in Asana, and moves the task on. The start skill calls it every poll interval; it does not loop by itself.
 ---
 
 # Reviewer skill (side hustle)
