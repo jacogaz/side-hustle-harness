@@ -2,7 +2,7 @@
 
 Shared configuration and default harness for **Side Hustle**: team members publish tasks in Asana, and the agents of teammates with spare token capacity pick them up, implement, review and deliver them. The functional spec is [SPEC.md](SPEC.md).
 
-This repo is a **Claude Code plugin** (`side-hustle`) with its own marketplace (`side-hustle-harness`). Every team member installs it once from GitHub and updates it from there. Target repos, where tasks are implemented, stay on GitLab.
+This repo is a **Claude Code plugin** (`side-hustle`) with its own marketplace (`side-hustle-harness`). Every team member installs it once from GitHub and updates it from there. Target repos, where Code tasks are implemented, are GitHub repositories too (PoC).
 
 ## Layout
 
