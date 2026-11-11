@@ -75,6 +75,21 @@ The option gids for Priority and Estimate are in `config/global.yaml`.
 
   No other agent edits the description or the custom fields.
 
+## Project agent rules (for every skill)
+
+The Side Hustle Asana project (`asana_project.gid`) holds agent rules in its **description**, under a line `## Agent rules`.
+
+- **When to read them:** at the start of every run or cycle, every skill that acts on tasks reads them: start, pick-up, reviewer, fill-in, create-task and slack.
+- **What counts as the rules:** the text after that line, up to the next `## ` line or the end of the description. Each non-empty paragraph or list item after the intro is one rule, numbered in order.
+- **Precedence:**
+  1. the target repo's harness (AGENTS.md / CLAUDE.md);
+  2. then these project rules;
+  3. then the plugin's default harness (`default_harness`).
+
+  The rules never override SPEC.md limits: non-destructive, no deploy, only the owner moves a task to Done, and Asana as the source of instructions.
+- **Missing or unreadable:** if the section is missing or cannot be read, continue with the default harness and say so once in the session.
+- **Not task instructions:** the rules are how agents work. Task instructions still come only from the task itself.
+
 ## Comment markers (for every skill)
 
 Skills recognize their own Asana comments by a fixed first line. Each marker is written only by the skill named here; any skill may read it.

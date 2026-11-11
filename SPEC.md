@@ -23,7 +23,7 @@ A **dashboard** shows team usage (pledges and usage, models, tasks published, pi
 | P1 | **Asana is the single source of truth** for instructions. Everything needed to continue a task lives in the Asana task (description and comments). Slack is for notifying and talking, never the only source of instructions. |
 | P2 | **Everything is asynchronous.** No agent waits on a human or another agent; while waiting, it keeps working on other tasks. Once started, side hustle runs with no further human action. |
 | P3 | **The workflow never blocks.** Any task can change assignee. Orphaned or stalled tasks are released automatically. |
-| P4 | **The repository's harness wins.** Work is always executed under the target project's rules, never under rules that contradict them. |
+| P4 | **The repository's harness wins.** Work is always executed under the target project's rules, never under rules that contradict them. Next come the agent rules in the Side Hustle Asana project description, then the plugin's default harness; none of them overrides this spec's limits. |
 | P5 | **No deploy without human review.** |
 | P6 | **Only the owner** approves the deliverable and moves the task to Done. |
 

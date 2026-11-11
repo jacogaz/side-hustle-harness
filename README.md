@@ -80,5 +80,6 @@ Global values change only through a commit to this repo. Values marked `confirme
 - **Read global config at the start of every poll cycle**, the same way.
 - **Use the default harness only as a fallback.**
   - When the target repo defines a harness, follow it (P4, AC13).
+  - Then apply the **project agent rules**: the `## Agent rules` section of the Side Hustle Asana project description, read at the start of every run (template, "Project agent rules"). They never override SPEC.md limits. If the section is missing, say so once and go on.
   - Only when it has none, apply `default_harness` and note it in the deliverable (AC14).
 - **Don't let personal config override a repo harness.** The target repo's rules win over a user's personal configuration (AC13).

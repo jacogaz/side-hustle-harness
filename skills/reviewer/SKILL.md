@@ -8,6 +8,7 @@ description: One cycle step of a user's side hustle loop. It independently revie
 This skill does **R's reviewer duties** for one cycle (SPEC.md UC4, UC10, E9, E10, E21, AC22–AC27). R is the user whose session runs it. It runs one pass and returns, and it never waits on anyone (AC40).
 
 It uses:
+- **The project agent rules (`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`, "Project agent rules")**, read at the start of every run and applied;
 - **`${CLAUDE_PLUGIN_ROOT}/config/global.yaml`** for the section and custom field gids, `max_reviewer_attempts`, `heartbeat_timeout_hours` and `default_harness`;
 - **`${CLAUDE_PLUGIN_DATA}/user.yaml`** for R's side hustle mode and `poll_interval_minutes`;
 - **`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`** for task fields and comment markers;
@@ -82,7 +83,7 @@ For code, check out the branch in a clean workspace of your own, and never push 
    - no removal of files, tests or functionality that the task did not explicitly request.
 
    The first four have no exception. A requested removal never excuses any of them.
-4. **Harness:** the **effective harness** passes: the target repo's harness (tests, lint, conventions) when it has one, otherwise `default_harness`. If the default harness applies, the deliverable must say so (AC14).
+4. **Harness:** the **effective harness** passes: the target repo's harness (tests, lint, conventions) when it has one, then the project agent rules, then `default_harness`, in that order of precedence. If the default harness applies, the deliverable must say so (AC14).
 
 **Failure classes:**
 - If check 3 fails, the failure is **destructive**.
