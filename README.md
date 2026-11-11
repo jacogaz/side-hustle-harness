@@ -42,6 +42,14 @@ That's all.
 - **To stop:** close the session. Your tasks are then recovered by the heartbeat timeout. Run `/side-hustle:start` again to start a fresh cycle.
 - **Known PoC limitation:** if you close a session and run `/side-hustle:start` in a new one within two poll intervals (about 30 minutes), the old cycle still looks alive. Only your pledge is updated, and no cycle is started. The skill tells you when to run it again, which is once the old check-in is stale.
 
+## Models
+
+To keep cost down, the work is split by model:
+- **Haiku (mechanical work):** each cycle turn of `/side-hustle:start` runs on Haiku, set by the skill's frontmatter `model: haiku`. That covers polling, eligibility and claims, heartbeats, orphan and partial-claim recovery, pending notices, owner duties (Slack threads, copying replies, reminders, stalled) and usage reporting.
+- **Sonnet by default (judgment work), in subagents:** implementation and delivery (`models.implement`) and the independent review (`models.review`), set in `config/global.yaml`. A subagent is started only when there is such work.
+- **Usage reporting** counts the subagents' usage per model.
+- **Still on your session model:** anything you type yourself, including `/side-hustle:create-task` and `/side-hustle:dashboard`. You can run that session with `claude --model haiku` if you like.
+
 ## Configuration reference
 
 ### Per-user (`${CLAUDE_PLUGIN_DATA}/user.yaml`, template `config/user.example.yaml`)
@@ -65,6 +73,7 @@ That's all.
 | `default_budget_per_size` | Default budget for `S` / `M` / `L` estimates, as % of the weekly usage limit, when the owner gives no budget. |
 | `default_harness` | Path to the default harness file. |
 | `slack_channel` | Name and id of the shared side hustle channel. |
+| `models` | Models for the judgment subagents: `implement` and `review` (confirmed default `sonnet`). |
 | `usage` | Usage reporting: estimated weekly limit in tokens, price per model, and the ledger task for pledges. | §11 |
 | `asana_project` | Gids of the Side Hustle Asana project, its sections (all seven) and its custom fields (Priority, Estimate, Budget, Last heartbeat) with their options. |
 

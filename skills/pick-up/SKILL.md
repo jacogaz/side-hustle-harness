@@ -55,15 +55,23 @@ This step runs even when side hustle mode is off or B has no pledge left (AC53).
 For each task assigned to B:
 - **Claim record repair (first):** if the current assignment to B, from the task's history, has no `Side hustle claim:` record by B written after it, add one now, once. Use the ISO week of that assignment, not the current week. This way a crash can never leave a claimed task out of pledge accounting.
 - **Pending claim:** the task is still in Open or Next. Finish the claim idempotently with steps 3–4 of "To claim". The claim record was already repaired above, so do not write a second one.
-- **In Doing**, if this session is not already working on it: implement it (step 4). If it was released before, resume from the documented state (AC43).
+- **In Doing**, if this session is not already working on it: implement it (step 4) in a subagent (see "Implementation subagent"). If it was released before, resume from the documented state (AC43).
 - **In To Review:**
   - set `Last heartbeat` to now every cycle while the task waits, either for a reviewer or for delivery after a PASS. A task in To Review is then orphaned only when B's session is gone; the reviewer also updates the heartbeat while it is actively reviewing;
-  - when the **authoritative** review result is `PASS`, deliver it (step 5). That result is the first `Side hustle review:` comment after the task last entered To Review; later ones are void. Read the task again just before delivering to confirm this.
+  - when the **authoritative** review result is `PASS`, deliver it (step 5) in an implementation subagent. That result is the first `Side hustle review:` comment after the task last entered To Review; later ones are void. Read the task again just before delivering to confirm this.
 - **Anything else**, such as QA Review or Needs Info: nothing to do, move on.
 
 **Pledge used up mid-task (E5, AC19, AC20)** applies only once usage reporting gives a measured (not estimated) % of the weekly limit. Until then, a claimed task's budget is reserved for the whole task, so work underway is never stopped for pledge reasons. Once actual usage is measured, a task whose usage exhausts B's pledge is handled per `on_pledge_used_up`:
 - `finish`: complete it and claim nothing more;
 - `release`: release it (see "Release a task").
+
+**Implementation subagent.** Run step 4 (implement) and step 5 (deliver) for a task in a subagent, using the Agent tool with `model` set to `models.implement` from `config/global.yaml`.
+- **Pass it:** the task gid, the absolute path of this skill file (`${CLAUDE_PLUGIN_ROOT}/skills/pick-up/SKILL.md`) with which steps to follow, the plugin root, and the lock path `${CLAUDE_PLUGIN_DATA}/cycle.lock`.
+- **The subagent:**
+  - follows the assignee lock and the heartbeat rule;
+  - checks that the lock is still owned by this session each time it updates the heartbeat, and stops if it is not;
+  - returns a one-line result.
+- **No Agent tool:** if it is not available, do the step in the current turn.
 
 ### 3. Claim new tasks (AC1–AC5, AC9–AC12)
 

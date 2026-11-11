@@ -55,7 +55,7 @@ Your own result, once it is authoritative, is never a reason to abandon. You sti
 
 ## 3. Review in an independent context (AC22)
 
-Run the checks in a **fresh agent context**, never in the context that implemented the task. This applies even when R implemented it.
+Run the checks in a **fresh agent context**, never in the context that implemented the task. This applies even when R implemented it. Use a subagent (Agent tool) with `model` set to `models.review` from `${CLAUDE_PLUGIN_ROOT}/config/global.yaml`.
 
 Give that context only the following.
 - **The task:**
