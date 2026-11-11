@@ -1,5 +1,5 @@
 ---
-name: side-hustle-usage-reporting
+name: usage-reporting
 description: One cycle step of a user's side hustle loop. It reports the usage of this cycle to Asana per person, model, task and phase, and the user's pledge for the week, so the dashboard can read it. start-side-hustle calls it at the end of each cycle; it does not loop by itself.
 ---
 
@@ -34,7 +34,7 @@ The segment ends when the next one starts, or when the step ends. Work that touc
 - **Count per segment:** for each `(task, phase, model)`, sum `input_tokens + output_tokens + cache_creation_input_tokens + cache_read_input_tokens` over those responses.
 - **If a transcript cannot be read**, the session's or a subagent's: estimate that part as its characters ÷ 4 and mark the line `tokens: estimate`. If not even that is possible, mark it `tokens: unavailable`. Never report missing usage as a measured zero.
 
-**Cost (estimate).** `cost_usd = tokens / 1,000,000 × price_usd_per_mtok[model]`, with the rate from `config/global.yaml` `usage.price_usd_per_mtok`. Models without a rate report `cost: n/a`. A subscription is not billed per token, so the cost is an API-equivalent figure for comparison only.
+**Cost (estimate).** `cost_usd = tokens / 1,000,000 × price_usd_per_mtok[model]`, with the rate from `${CLAUDE_PLUGIN_ROOT}/config/global.yaml` `usage.price_usd_per_mtok`. Models without a rate report `cost: n/a`. A subscription is not billed per token, so the cost is an API-equivalent figure for comparison only.
 
 **% of the weekly limit (estimate).** Claude Code does not expose the weekly limit as a number, so this is `100 × tokens / usage.weekly_limit_tokens_estimate`.
 
@@ -51,7 +51,7 @@ Before posting, read the task's comments. Never post twice for the same cycle st
 
 ## 3. Report the pledge (AC48)
 
-Keep B's pledge on the ledger task, `usage.ledger_task` in `config/global.yaml`. It is a completed system task in Done that every other skill ignores.
+Keep B's pledge on the ledger task, `usage.ledger_task` in `${CLAUDE_PLUGIN_ROOT}/config/global.yaml`. It is a completed system task in Done that every other skill ignores.
 - **When:** at the first cycle of a week, and whenever `pledge_percent` changes.
 - **What:** add `Side hustle pledge: <B> · <pledge_percent>% · <ISO week>`.
 
@@ -64,7 +64,7 @@ The dashboard derives task events from what Asana already holds, so this skill r
 - **Picked up:** the `Side hustle claim:` record and the assignee change.
 - **Section changes:** the section history.
 - **Completed:** moved to Done.
-- **Released, stalled, review results:** their markers in `templates/task-description.md`.
+- **Released, stalled, review results:** their markers in `${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`.
 
 ## Pledge used stays on reserved budgets
 

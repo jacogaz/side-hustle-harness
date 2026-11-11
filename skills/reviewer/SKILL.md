@@ -1,5 +1,5 @@
 ---
-name: side-hustle-reviewer
+name: reviewer
 description: One cycle step of a user's side hustle loop. It independently reviews tasks in To Review with the four checks of UC4, records the result in Asana, and moves the task on. start-side-hustle calls it every poll interval; it does not loop by itself.
 ---
 
@@ -8,10 +8,10 @@ description: One cycle step of a user's side hustle loop. It independently revie
 This skill does **R's reviewer duties** for one cycle (SPEC.md UC4, UC10, E9, E10, E21, AC22–AC27). R is the user whose session runs it. It runs one pass and returns, and it never waits on anyone (AC40).
 
 It uses:
-- **`config/global.yaml`** for the section and custom field gids, `max_reviewer_attempts`, `heartbeat_timeout_hours` and `default_harness`;
-- **`config/user.yaml`** for R's side hustle mode and `poll_interval_minutes`;
-- **`templates/task-description.md`** for task fields and comment markers;
-- **`skills/slack/SKILL.md`** for notices.
+- **`${CLAUDE_PLUGIN_ROOT}/config/global.yaml`** for the section and custom field gids, `max_reviewer_attempts`, `heartbeat_timeout_hours` and `default_harness`;
+- **`${CLAUDE_PLUGIN_DATA}/user.yaml`** for R's side hustle mode and `poll_interval_minutes`;
+- **`${CLAUDE_PLUGIN_ROOT}/templates/task-description.md`** for task fields and comment markers;
+- **`${CLAUDE_PLUGIN_ROOT}/skills/slack/SKILL.md`** for notices.
 
 Re-read both config files every cycle. **Gate:**
 - run only while side hustle mode is on;

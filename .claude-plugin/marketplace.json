@@ -1,0 +1,14 @@
+{
+  "name": "side-hustle-harness",
+  "owner": {
+    "name": "Juan Garcia"
+  },
+  "description": "Team marketplace for the Side Hustle harness plugin.",
+  "plugins": [
+    {
+      "name": "side-hustle",
+      "source": "./",
+      "description": "Side Hustle harness skills (start-side-hustle, create-task, pick-up, reviewer, fill-in, slack, usage-reporting, dashboard)."
+    }
+  ]
+}

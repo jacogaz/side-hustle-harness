@@ -2,7 +2,7 @@
 
 Shared configuration and default harness for **Side Hustle**: team members publish tasks in Asana, and the agents of teammates with spare token capacity pick them up, implement, review and deliver them. The functional spec is [SPEC.md](SPEC.md).
 
-This repo is installed by every team member. Target repos, where tasks are implemented, stay on GitLab.
+This repo is a **Claude Code plugin** (`side-hustle`) with its own marketplace (`side-hustle-harness`). Every team member installs it once from GitHub and updates it from there. Target repos, where tasks are implemented, stay on GitLab.
 
 ## Layout
 
@@ -10,12 +10,14 @@ This repo is installed by every team member. Target repos, where tasks are imple
 |---|---|---|
 | `config/global.yaml` | Global configuration, shared by the team. | §6 |
 | `config/user.example.yaml` | Template for per-user configuration. | §5 |
-| `config/user.yaml` | Your own per-user configuration (git-ignored). Written by `/start-side-hustle`. | §5 |
+| `${CLAUDE_PLUGIN_DATA}/user.yaml` | Your own per-user configuration, outside the plugin (`~/.claude/plugins/data/side-hustle-side-hustle-harness/user.yaml`), so plugin updates never replace it. Written by `/side-hustle:start-side-hustle`. | §5 |
+| `${CLAUDE_PLUGIN_DATA}/cycle.lock` | Marks your active side hustle cycle (same folder). | UC10 |
+| `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` | Plugin and marketplace manifests. | §12 |
 | `harness/DEFAULT_HARNESS.md` | Default harness, applied when a target repo has none. | E4, AC14 |
-| `skills/start-side-hustle/SKILL.md` | The single trigger: one pledge question, writes `config/user.yaml`, starts the recurring cycle that runs the other skills. | §12, UC10, AC52–AC58 |
+| `skills/start-side-hustle/SKILL.md` | The single trigger: one pledge question, writes your `user.yaml`, starts the recurring cycle that runs the other skills. | §12, UC10, AC52–AC58 |
 | `skills/slack/SKILL.md` | Slack skill: one thread per task, transition notices, mentions, reading replies. | §12, UC1, AC44 |
 | `skills/create-task/SKILL.md` | Create-task skill: publishes a task with the full template, a budget and a Slack thread. | §12, UC1, AC6, AC8 |
-| `skills/dashboard/SKILL.md` | Dashboard (`/side-hustle-dashboard`): reads Asana and shows the usage, flow, quality, people and optimization blocks with names, plus informational insights. Read-only. | §11, AC46–AC51 |
+| `skills/dashboard/SKILL.md` | Dashboard (`/side-hustle:dashboard`): reads Asana and shows the usage, flow, quality, people and optimization blocks with names, plus informational insights. Read-only. | §11, AC46–AC51 |
 | `skills/usage-reporting/SKILL.md` | Usage reporting: one cycle step that reports usage per person, model, task and phase, and the weekly pledge, as Asana comments. | §11, AC47, AC48 |
 | `skills/fill-in/SKILL.md` | Fill-in skill: owner-duty cycle step for Needs Info (fill in, ask, reopen), the single reminder, stalled release and clearing. | §12, UC7, AC36–AC39 |
 | `skills/reviewer/SKILL.md` | Reviewer skill: one cycle step that reviews tasks in To Review with the four UC4 checks in an independent context. | §12, UC4, AC22–AC27 |
@@ -24,18 +26,24 @@ This repo is installed by every team member. Target repos, where tasks are imple
 
 ## Setup (each team member)
 
-1. Clone or install this repo.
-2. In Claude Code, run `/start-side-hustle` and answer its one question: how much of your weekly Claude usage to pledge (a %; 0 = only follow up on your own tasks).
+In Claude Code:
+
+1. Add the marketplace: `/plugin marketplace add jacogaz/side-hustle-harness`
+2. Install the plugin: `/plugin install side-hustle@side-hustle-harness`. On Claude Code 2.1.275 or later, `/plugin install side-hustle --marketplace jacogaz/side-hustle-harness` does steps 1 and 2 in one go.
+3. Run `/reload-plugins`, or restart Claude Code.
+4. Run `/side-hustle:start-side-hustle` and answer its one question: how much of your weekly Claude usage to pledge (a %; 0 = only follow up on your own tasks).
 
 That's all.
-- **What it does:** it writes `config/user.yaml` for you, with the confirmed defaults for everything else, and starts the side hustle cycle in your open session every 15 minutes. Nobody copies or edits the file by hand.
-- **To change your pledge:** run `/start-side-hustle` again. It never starts a second cycle.
-- **To stop:** close the session. Your tasks are then recovered by the heartbeat timeout. Run `/start-side-hustle` again to start a fresh cycle.
-- **Known PoC limitation:** if you close a session and run `/start-side-hustle` in a new one within two poll intervals (about 30 minutes), the old cycle still looks alive. Only your pledge is updated, and no cycle is started. The skill tells you when to run it again, which is once the old check-in is stale.
+- **Commands:** they are `/side-hustle:<skill>`, for example `/side-hustle:start-side-hustle`, `/side-hustle:create-task` and `/side-hustle:dashboard`. The short form, for example `/start-side-hustle`, also works when no other command has that name.
+- **Updates:** in a terminal, run `claude plugin update side-hustle@side-hustle-harness`, then run `/reload-plugins` in Claude Code. Inside Claude Code you can instead use `/plugin` → Installed → side-hustle → Update now. Your `user.yaml` is kept.
+- **What it does:** it writes your `user.yaml` (`~/.claude/plugins/data/side-hustle-side-hustle-harness/`) for you, with the confirmed defaults for everything else, and starts the side hustle cycle in your open session every 15 minutes. Nobody copies or edits the file by hand.
+- **To change your pledge:** run `/side-hustle:start-side-hustle` again. It never starts a second cycle.
+- **To stop:** close the session. Your tasks are then recovered by the heartbeat timeout. Run `/side-hustle:start-side-hustle` again to start a fresh cycle.
+- **Known PoC limitation:** if you close a session and run `/side-hustle:start-side-hustle` in a new one within two poll intervals (about 30 minutes), the old cycle still looks alive. Only your pledge is updated, and no cycle is started. The skill tells you when to run it again, which is once the old check-in is stale.
 
 ## Configuration reference
 
-### Per-user (`config/user.yaml`)
+### Per-user (`${CLAUDE_PLUGIN_DATA}/user.yaml`, template `config/user.example.yaml`)
 
 | Key | Values | Meaning |
 |---|---|---|
@@ -63,8 +71,10 @@ Global values change only through a commit to this repo. Values marked `confirme
 
 ## Rules for skills that read this configuration
 
+- **Paths.** Shared files (`config/`, `templates/`, `harness/`, `skills/`) are read from the plugin root, `${CLAUDE_PLUGIN_ROOT}`. Per-user state (`user.yaml`, `cycle.lock`) lives in `${CLAUDE_PLUGIN_DATA}`, never inside the plugin directory, which updates replace.
+
 - **Read per-user config at the start of every poll cycle.**
-  - Read `config/user.yaml` again at the start of each cycle; never cache it between cycles. This is how a change applies from the next poll cycle (AC7).
+  - Read `${CLAUDE_PLUGIN_DATA}/user.yaml` again at the start of each cycle; never cache it between cycles. This is how a change applies from the next poll cycle (AC7).
   - If the file is missing, treat side hustle mode as off.
 - **Read global config at the start of every poll cycle**, the same way.
 - **Use the default harness only as a fallback.**
