@@ -67,6 +67,9 @@ Run these steps in order, once, then return. Never wait on a person or another a
   - implementation and delivery (pick-up): `models.implement`;
   - the independent review (reviewer): `models.review`.
 - **Only when there is work:** start such a subagent only when there is implementation, delivery or review work to do.
+- **Wait for subagents:** wait for every subagent this cycle started to finish before usage reporting (step 6) and before the turn ends, so their usage is counted in this cycle.
+  - If one cannot finish in this turn (for example it was stopped), record its unfinished work in Asana with a `Side hustle state:` comment on the task, so the task's existing heartbeat and recovery rules take over.
+  - Report the usage that is known, marking the rest `unavailable`.
 
 1. **Ownership (fencing):** read `${CLAUDE_PLUGIN_DATA}/cycle.lock`.
    - **This session is the owner:** set `alive_at` = now and go on.

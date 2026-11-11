@@ -69,7 +69,7 @@ For each task assigned to B:
 - **Pass it:** the task gid, the absolute path of this skill file (`${CLAUDE_PLUGIN_ROOT}/skills/pick-up/SKILL.md`) with which steps to follow, the plugin root, and the lock path `${CLAUDE_PLUGIN_DATA}/cycle.lock`.
 - **The subagent:**
   - follows the assignee lock and the heartbeat rule;
-  - checks that the lock is still owned by this session each time it updates the heartbeat, and stops if it is not;
+  - each time it updates the task heartbeat, reads the lock. If the lock is still owned by this session, it also sets the lock's `alive_at` to now, so a long implementation never makes the cycle look stale. If not, it stops;
   - returns a one-line result.
 - **No Agent tool:** if it is not available, do the step in the current turn.
 
