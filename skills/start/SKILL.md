@@ -1,9 +1,9 @@
 ---
-name: start-side-hustle
+name: start
 description: The single side hustle trigger. Asks how much of your weekly Claude usage to pledge, writes ${CLAUDE_PLUGIN_DATA}/user.yaml, and starts one recurring side hustle cycle in this Claude Code session that runs your owner, picker and reviewer duties every poll interval. Run it again to change your pledge.
 ---
 
-# Start side hustle (`/side-hustle:start-side-hustle`)
+# Start side hustle (`/side-hustle:start`)
 
 Running this skill is the whole opt-in (SPEC.md UC10, AC52–AC58). After it, nothing else needs to be done by hand. The user who runs it is **B**; that includes owners, who need it so that their owner agent runs.
 
@@ -11,7 +11,7 @@ Paths: shared files are read from the plugin, under `${CLAUDE_PLUGIN_ROOT}`. B's
 
 **Invoked with the argument `cycle`** (by the recurring job): run only "One cycle" below, then return.
 
-## When the user runs `/side-hustle:start-side-hustle`
+## When the user runs `/side-hustle:start`
 
 ### 1. Ask the one question
 
@@ -38,13 +38,13 @@ The lock `${CLAUDE_PLUGIN_DATA}/cycle.lock` names the **owner session**, the one
 **Steps:**
 1. **The lock is live,** whichever session owns it: the cycle is active (AC57, E20). Only the pledge and the mode changed, and the next run reads them. Schedule nothing.
 
-   If the owner is **another session**, tell B once, plainly: "A side hustle cycle in another session checked in <N> minutes ago. If you closed that session, run /side-hustle:start-side-hustle again after <HH:MM>." `<HH:MM>` is when the lock becomes stale: `alive_at` + 2 × `poll_interval_minutes`.
+   If the owner is **another session**, tell B once, plainly: "A side hustle cycle in another session checked in <N> minutes ago. If you closed that session, run /side-hustle:start again after <HH:MM>." `<HH:MM>` is when the lock becomes stale: `alive_at` + 2 × `poll_interval_minutes`.
 2. **No lock, or a stale one:** start a fresh cycle in this session.
    1. Write this session as owner, with `alive_at` = now.
    2. Read the lock again. If another session wrote it in between, treat the lock as live (step 1).
    3. Create this session's recurring Claude Code job with `/loop` at `poll_interval_minutes`, unless this session already has one, for example:
       ```
-      /loop 15m /side-hustle:start-side-hustle cycle
+      /loop 15m /side-hustle:start cycle
       ```
    4. Run the first cycle right away.
 
@@ -53,7 +53,7 @@ The lock `${CLAUDE_PLUGIN_DATA}/cycle.lock` names the **owner session**, the one
 Tell B in one line:
 - the pledge, and whether side hustle mode is on;
 - that the cycle runs every `poll_interval_minutes` while this session stays open;
-- that closing the session stops it, and that the heartbeat timeout then recovers B's tasks (E18, AC56); running `/side-hustle:start-side-hustle` again later starts a fresh cycle.
+- that closing the session stops it, and that the heartbeat timeout then recovers B's tasks (E18, AC56); running `/side-hustle:start` again later starts a fresh cycle.
 
 ## One cycle
 

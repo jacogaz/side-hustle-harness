@@ -1,17 +1,17 @@
 ---
 name: usage-reporting
-description: One cycle step of a user's side hustle loop. It reports the usage of this cycle to Asana per person, model, task and phase, and the user's pledge for the week, so the dashboard can read it. start-side-hustle calls it at the end of each cycle; it does not loop by itself.
+description: One cycle step of a user's side hustle loop. It reports the usage of this cycle to Asana per person, model, task and phase, and the user's pledge for the week, so the dashboard can read it. The start skill calls it at the end of each cycle; it does not loop by itself.
 ---
 
 # Usage reporting skill (side hustle)
 
-This skill makes every agent report its usage (SPEC.md §11, AC47, AC48), so that the dashboard can attribute it. B is the user whose session runs it. It runs at the end of each cycle (start-side-hustle step 6), in one pass, and never waits on anyone.
+This skill makes every agent report its usage (SPEC.md §11, AC47, AC48), so that the dashboard can attribute it. B is the user whose session runs it. It runs at the end of each cycle (start skill step 6), in one pass, and never waits on anyone.
 
 **Asana is the store.** Every report is an Asana comment, the same as every other side hustle record. There is no new infrastructure, and every user and the dashboard can read it.
 
 ## During the cycle: the segment log
 
-start-side-hustle keeps a short log in the session while the cycle runs. Each time the cycle starts working on a task, it notes:
+The start skill keeps a short log in the session while the cycle runs. Each time the cycle starts working on a task, it notes:
 - the time;
 - the task gid;
 - the phase:

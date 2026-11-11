@@ -8,7 +8,7 @@
     {
       "name": "side-hustle",
       "source": "./",
-      "description": "Side Hustle harness skills (start-side-hustle, create-task, pick-up, reviewer, fill-in, slack, usage-reporting, dashboard)."
+      "description": "Side Hustle harness skills (start, create-task, pick-up, reviewer, fill-in, slack, usage-reporting, dashboard)."
     }
   ]
 }
