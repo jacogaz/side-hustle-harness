@@ -35,7 +35,7 @@ In Claude Code:
 
 That's all.
 - **Commands:** they are `/side-hustle:<skill>`, for example `/side-hustle:start-side-hustle`, `/side-hustle:create-task` and `/side-hustle:dashboard`. The short form, for example `/start-side-hustle`, also works when no other command has that name.
-- **Updates:** `/plugin update side-hustle@side-hustle-harness`, then `/reload-plugins`. Your `user.yaml` is kept.
+- **Updates:** in a terminal, run `claude plugin update side-hustle@side-hustle-harness`, then run `/reload-plugins` in Claude Code. Inside Claude Code you can instead use `/plugin` → Installed → side-hustle → Update now. Your `user.yaml` is kept.
 - **What it does:** it writes your `user.yaml` (`~/.claude/plugins/data/side-hustle-side-hustle-harness/`) for you, with the confirmed defaults for everything else, and starts the side hustle cycle in your open session every 15 minutes. Nobody copies or edits the file by hand.
 - **To change your pledge:** run `/side-hustle:start-side-hustle` again. It never starts a second cycle.
 - **To stop:** close the session. Your tasks are then recovered by the heartbeat timeout. Run `/side-hustle:start-side-hustle` again to start a fresh cycle.
