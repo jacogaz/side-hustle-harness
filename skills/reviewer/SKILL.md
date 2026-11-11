@@ -62,7 +62,7 @@ Give that context only the following.
   - the owner's comments: instructions and clarifications;
   - earlier `Side hustle review:` reports.
 - **The deliverable**, located through the latest `Side hustle state:` comment:
-  - Code: the branch `side-hustle/<task gid>` against its base;
+  - Code: the branch `side-hustle/<task gid>` of the target GitHub repo against its base. There is no pull request yet; the picker opens it at delivery;
   - Documentation: the Confluence draft;
   - Asana tasks: the proposed tasks.
 

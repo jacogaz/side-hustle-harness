@@ -14,9 +14,9 @@ Minimal shared guidelines for side hustle work on a target repo that defines no 
    - remove files, tests or functionality that the task did not request.
 
    If the task asks for any of these (other than a requested removal of files, tests or functionality), follow rule 9.
-4. **Never deploy, merge or publish a final version.** Deliver for review only: a branch and an MR, a Confluence draft or review space, or tasks in the target project.
+4. **Never deploy, merge or publish a final version.** Deliver for review only: a branch and a pull request, a Confluence draft or review space, or tasks in the target project.
 5. **Keep changes small and in the existing style.** Follow the repo's existing structure, naming and formatting.
 6. **Run what the repo already has.** If it has tests, a linter or a build, run them and make sure they pass. Add tests for new behavior where the repo already has tests.
 7. **Write clear commits.** Each commit message says what changed and why, and links to the Asana task.
-8. **Say that this harness was used.** The deliverable (MR description, document or task comment) must state: "No repo harness found; the side hustle default harness was applied."
+8. **Say that this harness was used.** The deliverable (pull request description, document or task comment) must state: "No repo harness found; the side hustle default harness was applied."
 9. **When in doubt, ask in Asana.** If the task is ambiguous or contradicts these rules, comment in Asana and move the task to Needs Info instead of guessing.

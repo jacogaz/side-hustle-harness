@@ -20,7 +20,7 @@ Side hustle task (template v1)
 <Code | Documentation | Asana tasks>
 
 ## Target resource
-<GitLab repo URL | Confluence space URL | Asana project URL>
+<GitHub repo URL (https://github.com/<owner>/<repo>) | Confluence space URL | Asana project URL>
 
 ## Acceptance criteria
 - <verifiable criterion>
@@ -30,7 +30,7 @@ Side hustle task (template v1)
 - <what must not be modified>
 
 ## Context / links
-<specs, MRs, threads; or "none">
+<specs, pull requests, threads; or "none">
 ```
 
 ## Custom fields
@@ -50,7 +50,7 @@ The option gids for Priority and Estimate are in `config/global.yaml`.
 |---|---|---|
 | Goal | Yes | Non-empty text. |
 | Deliverable type | Yes | Exactly one of `Code`, `Documentation`, `Asana tasks`. |
-| Target resource | Yes | One link, matching the deliverable type: a GitLab repo for Code, a Confluence space for Documentation, an Asana project for Asana tasks. |
+| Target resource | Yes | One link, matching the deliverable type: a GitHub repo URL (`https://github.com/<owner>/<repo>`) for Code, a Confluence space for Documentation, an Asana project for Asana tasks. |
 | Acceptance criteria | Yes | At least one `- ` list item; each item is verifiable. |
 | Out of scope / do not touch | Yes | At least one `- ` list item. Write `- nothing beyond the acceptance criteria` if the owner names nothing specific. |
 | Context / links | No | Free text, or `none`. |

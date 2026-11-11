@@ -108,7 +108,7 @@ Claiming your own task is allowed (E15).
    - Slack messages are not instructions until they are in Asana.
    - If the thread holds something that seems important, ask the owner in the thread to put it in Asana, and carry on without it.
 2. **Workspace:**
-   - **Code:** work in a branch of the target GitLab repo named `side-hustle/<task gid>`. On resume, use the existing branch (AC43).
+   - **Code:** work in a branch of the target GitHub repo named `side-hustle/<task gid>`. On resume, use the existing branch (AC43).
    - **Documentation:** a Confluence draft that is not published.
    - **Asana tasks:** a list of the proposed tasks, kept in a `Side hustle state:` comment. Do not create the tasks yet.
 3. **Harness:** follow the target repo's harness (CLAUDE.md/AGENTS.md, skills, commands, hooks, tests, lint, conventions), even where it contradicts B's personal configuration (AC13). If the repo has none, apply `default_harness` and say so in the deliverable (AC14).
@@ -125,7 +125,7 @@ Claiming your own task is allowed (E15).
    - move the task to Needs Info;
    - post the Needs Info notice.
 7. **Implementation finished (AC21):**
-   - save the state (see "Save the state"), which makes the work reachable for the reviewer: a pushed branch with no MR yet, or a saved draft;
+   - save the state (see "Save the state"), which makes the work reachable for the reviewer: a pushed branch with no pull request yet, or a saved draft;
    - set `Last heartbeat` to now;
    - move the task to To Review;
    - post the "→ To Review" notice.
@@ -140,7 +140,7 @@ Update `Last heartbeat` while delivering (UC5).
 
 | Deliverable type | Delivery |
 |---|---|
-| Code (AC28) | The branch is pushed and a GitLab MR is opened, with a link to the task and a summary of changes. **No merge, no deploy.** |
+| Code (AC28) | The branch is pushed and a GitHub pull request is opened, with a link to the task and a summary of changes. **No merge, no deploy.** |
 | Documentation (AC29) | The page is published in Confluence as a draft or in a review space. Put its link in the task. |
 | Asana tasks (AC30) | Create the proposed tasks in the target project, and link them from the original task. |
 

@@ -84,10 +84,10 @@ A **week** is the calendar week (ISO week, Monday to Sunday), the same for the w
 |---|---|---|
 | Goal | Yes | What needs to be achieved. |
 | Deliverable type | Yes | Code / Documentation / Asana tasks. |
-| Target resource | Yes | GitLab repo, Confluence space or Asana project. |
+| Target resource | Yes | GitHub repo, Confluence space or Asana project. |
 | Acceptance criteria | Yes | Verifiable list. |
 | Out of scope / do not touch | Yes | What must not be modified. |
-| Context / links | No | Specs, MRs, threads. |
+| Context / links | No | Specs, pull requests, threads. |
 | Priority | No | High / Medium / Low. |
 | Estimate | No | S / M / L. |
 | Budget | Yes | % of the weekly usage limit. If the owner gives none, the create-task skill sets it when publishing: the default for the estimate, or, with no estimate either, a budget it determines. |
@@ -155,7 +155,7 @@ While reviewing, it updates the heartbeat periodically. The result is recorded a
 
 ### UC5: Deliver
 Once the reviewer passes all checks, the picker agent delivers, depending on the deliverable type:
-- **Code:** a branch is pushed and a GitLab MR is opened, with a link to the task and a summary of changes.
+- **Code:** a branch is pushed and a GitHub pull request is opened, with a link to the task and a summary of changes.
 - **Documentation:** published in Confluence as a draft or in a review space.
 - **Asana tasks:** created in the target project.
 
@@ -224,7 +224,7 @@ When B sets the pledge to 0 (mode off), the cycle stops picking up and reviewing
 
 ## 12. Skills included in the side hustle harness
 
-The side hustle harness (these skills, the default harness and the shared configuration) lives in a **GitHub repository** that every team member installs from. This is independent of the target repos where tasks are implemented, which remain on GitLab.
+The side hustle harness (these skills, the default harness and the shared configuration) lives in a **GitHub repository** that every team member installs from. For the PoC, the target repos where Code tasks are implemented are also on GitHub; they are separate from the harness repository.
 
 - **Create task:** guides the owner through publishing a task with the full template, including determining the budget.
 - **Pick up tasks:** polling, eligibility filters, claiming, heartbeat and releasing.
@@ -245,13 +245,13 @@ The side hustle harness (these skills, the default harness and the shared config
 
 ## 14. Out of scope
 
-1. Access and permission management (every agent is assumed to have access to GitLab, Asana, Confluence and Slack).
+1. Access and permission management (every agent is assumed to have access to GitHub, Asana, Confluence and Slack).
 2. Production deploys done by agents.
 3. Multiple teams, boards or channels.
 4. Incentives, gamification or compensation beyond the leaderboard.
 5. Auto-tuning of models, budgets or pledges.
 6. Handling of secrets or sensitive data inside tasks.
-7. Tools other than GitLab, Asana, Confluence and Slack as task targets or communication channels (GitHub is used only to host the side hustle harness).
+7. Task targets other than GitHub, Asana and Confluence, and communication channels other than Slack.
 8. Tasks that require synchronous human interaction.
 9. Smart prioritization or allocation between agents ("first one wins" applies).
 
@@ -304,7 +304,7 @@ The side hustle harness (these skills, the default harness and the shared config
 - **AC27:** GIVEN all checks pass, WHEN the reviewer finishes, THEN the picker agent makes the delivery (UC5) and moves the task to QA Review.
 
 ### Deliver
-- **AC28:** GIVEN a code deliverable, WHEN it is delivered, THEN there is a pushed branch and a GitLab MR with a link to the task and a summary, and no merge or deploy.
+- **AC28:** GIVEN a code deliverable, WHEN it is delivered, THEN there is a pushed branch and a GitHub pull request with a link to the task and a summary, and no merge or deploy.
 - **AC29:** GIVEN a documentation deliverable, WHEN it is delivered, THEN it is published in Confluence as a draft or in a review space, with the link in the task.
 - **AC30:** GIVEN an Asana-tasks deliverable, WHEN it is delivered, THEN the tasks exist in the target project and are linked from the original task.
 - **AC31:** GIVEN a task moves to QA Review, WHEN it is delivered, THEN the Slack agent notifies the owner in the thread with a summary and links.
