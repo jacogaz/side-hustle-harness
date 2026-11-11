@@ -62,3 +62,10 @@ usage:
   weekly_limit_tokens_estimate: 50000000   # PROPOSED DEFAULT, an ESTIMATE of one user's weekly limit (not an official figure)
   price_usd_per_mtok: {}                   # PROPOSED DEFAULT: API-equivalent ESTIMATE per model, e.g. {"<model id>": 5}; empty = cost shows n/a
   ledger_task: "1220392106821888"          # "Side hustle ledger (system, do not pick up)", completed, in Done; holds the pledge records
+
+# Models for the judgment work, which runs in subagents (Agent tool `model`: haiku, sonnet, opus or fable).
+# The mechanical cycle work (polling, recovery, owner duties, usage reporting) runs on the
+# start skill's own model, set by its frontmatter (`model: haiku`), not here.
+models:
+  implement: sonnet                 # confirmed default: pick-up implementation and delivery subagent
+  review: sonnet                    # confirmed default: reviewer's independent context

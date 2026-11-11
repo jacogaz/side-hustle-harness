@@ -1,5 +1,6 @@
 ---
 name: start
+model: haiku
 description: The single side hustle trigger. Asks how much of your weekly Claude usage to pledge, writes ${CLAUDE_PLUGIN_DATA}/user.yaml, and starts one recurring side hustle cycle in this Claude Code session that runs your owner, picker and reviewer duties every poll interval. Run it again to change your pledge.
 ---
 
@@ -59,6 +60,16 @@ Tell B in one line:
 ## One cycle
 
 Run these steps in order, once, then return. Never wait on a person or another agent (AC40).
+
+**Models.**
+- **This turn runs on Haiku,** from this skill's `model: haiku` frontmatter. It does the polling, recovery, claims, owner duties and usage reporting itself.
+- **Judgment work runs in subagents,** each with its model from `models` in `${CLAUDE_PLUGIN_ROOT}/config/global.yaml`:
+  - implementation and delivery (pick-up): `models.implement`;
+  - the independent review (reviewer): `models.review`.
+- **Only when there is work:** start such a subagent only when there is implementation, delivery or review work to do.
+- **Wait for subagents:** wait for every subagent this cycle started to finish before usage reporting (step 6) and before the turn ends, so their usage is counted in this cycle.
+  - If one cannot finish in this turn (for example it was stopped), record its unfinished work in Asana with a `Side hustle state:` comment on the task, so the task's existing heartbeat and recovery rules take over.
+  - Report the usage that is known, marking the rest `unavailable`.
 
 1. **Ownership (fencing):** read `${CLAUDE_PLUGIN_DATA}/cycle.lock`.
    - **This session is the owner:** set `alive_at` = now and go on.
