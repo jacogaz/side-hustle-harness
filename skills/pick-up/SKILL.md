@@ -136,14 +136,15 @@ Claiming your own task is allowed (E15).
    - move the task to Needs Info;
    - post the Needs Info notice.
 7. **Implementation finished (AC21):**
-   - save the state (see "Save the state"), which makes the work reachable for the reviewer: a pushed branch with no pull request yet, or a saved draft;
+   - save the state (see "Save the state"), which makes the work reachable for the reviewer: a pushed branch, or a saved draft;
+   - **Code:** open the GitHub pull request into the default branch **as a draft**, with a link to the task, a summary of changes, and the checks run or not run. If a PR for `side-hustle/<task gid>` already exists, reuse it; never open a second one. Record its URL in the `Side hustle state:` comment;
    - set `Last heartbeat` to now;
    - move the task to To Review;
    - post the "→ To Review" notice.
 
    Then move on. The review is someone else's step, so do not wait for it.
 
-After a retryable `FAIL` that the reviewer returned to Doing (attempts remain), step 2 picks the task up again in a later cycle. A destructive failure, or a `FAIL` with attempts exhausted, goes to Needs Info (E9, E10, AC24–AC26). From there the owner-side workflow continues, not this skill.
+After a retryable `FAIL` that the reviewer returned to Doing (attempts remain), step 2 picks the task up again in a later cycle. Fixes go to the same branch and draft PR. A destructive failure or exhausted attempts leave the draft PR open; it is not closed, and it is referenced in Asana. A destructive failure, or a `FAIL` with attempts exhausted, goes to Needs Info (E9, E10, AC24–AC26). From there the owner-side workflow continues, not this skill.
 
 ### 5. Deliver after the review passes (AC27–AC32)
 
@@ -151,7 +152,7 @@ Update `Last heartbeat` while delivering (UC5).
 
 | Deliverable type | Delivery |
 |---|---|
-| Code (AC28) | The branch is pushed and a GitHub pull request is opened, with a link to the task and a summary of changes. **No merge, no deploy.** |
+| Code (AC28) | Mark the existing draft pull request **ready for review** and update its description: the link to the task, a summary of changes, the checks run or not run, and the review result. **No merge, no deploy.** |
 | Documentation (AC29) | The page is published in Confluence as a draft or in a review space. Put its link in the task. |
 | Asana tasks (AC30) | Create the proposed tasks in the target project, and link them from the original task. |
 
@@ -186,7 +187,7 @@ Whoever claims the task next resumes from that documented state, not from scratc
 
 Do this before every hand-off: To Review, Needs Info, and a release by the working agent. Its purpose is that another agent, or you in a later session, can continue from Asana alone (AC43).
 1. **Make the work durable and reachable, following the repo's rules:**
-   - **Code:** commit the work in progress on `side-hustle/<task gid>` and push the branch. Never force-push and never do destructive cleanup.
+   - **Code:** commit the work in progress on `side-hustle/<task gid>` and push the branch. Never force-push and never do destructive cleanup. If the task already has a PR, the push updates that PR, and the next picker continues on the same branch and PR.
    - **Documentation:** save the Confluence draft, still unpublished.
    - **Asana tasks:** the proposed tasks are kept in the state comment.
 2. **Add a `Side hustle state:` comment** with:

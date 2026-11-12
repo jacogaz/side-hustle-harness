@@ -1,6 +1,6 @@
 {
   "name": "side-hustle",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Side Hustle harness: publish Asana tasks and let teammates' agents with spare Claude capacity pick them up, implement, review and deliver them. Start with /side-hustle:start.",
   "author": { "name": "Juan Garcia" },
   "repository": "https://github.com/jacogaz/side-hustle-harness"

@@ -155,7 +155,7 @@ While reviewing, it updates the heartbeat periodically. The result is recorded a
 
 ### UC5: Deliver
 Once the reviewer passes all checks, the picker agent delivers, depending on the deliverable type:
-- **Code:** a branch is pushed and a GitHub pull request is opened, with a link to the task and a summary of changes.
+- **Code:** the GitHub pull request, opened as a draft when the task went to To Review, is marked ready for review, with a link to the task and a summary of changes.
 - **Documentation:** published in Confluence as a draft or in a review space.
 - **Asana tasks:** created in the target project.
 
@@ -304,7 +304,7 @@ The side hustle harness (these skills, the default harness and the shared config
 - **AC27:** GIVEN all checks pass, WHEN the reviewer finishes, THEN the picker agent makes the delivery (UC5) and moves the task to QA Review.
 
 ### Deliver
-- **AC28:** GIVEN a code deliverable, WHEN it is delivered, THEN there is a pushed branch and a GitHub pull request with a link to the task and a summary, and no merge or deploy.
+- **AC28:** GIVEN a code deliverable, WHEN it is delivered, THEN there is a pushed branch and a GitHub pull request, opened as a draft at To Review and now ready for review, with a link to the task and a summary, and no merge or deploy.
 - **AC29:** GIVEN a documentation deliverable, WHEN it is delivered, THEN it is published in Confluence as a draft or in a review space, with the link in the task.
 - **AC30:** GIVEN an Asana-tasks deliverable, WHEN it is delivered, THEN the tasks exist in the target project and are linked from the original task.
 - **AC31:** GIVEN a task moves to QA Review, WHEN it is delivered, THEN the Slack agent notifies the owner in the thread with a summary and links.
