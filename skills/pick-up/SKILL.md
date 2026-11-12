@@ -70,6 +70,7 @@ For each task assigned to B:
 - **The subagent:**
   - follows the assignee lock and the heartbeat rule;
   - each time it updates the task heartbeat, reads the lock. If the lock is still owned by this session, it also sets the lock's `alive_at` to now, so a long implementation never makes the cycle look stale. If not, it stops;
+  - right before every push, PR creation, undraft or PR description update, re-checks that this session still owns the cycle lock **and** that the task is still assigned to B. If either check fails, it stops without doing that action;
   - returns a one-line result.
 - **No Agent tool:** if it is not available, do the step in the current turn.
 
@@ -137,7 +138,7 @@ Claiming your own task is allowed (E15).
    - post the Needs Info notice.
 7. **Implementation finished (AC21):**
    - save the state (see "Save the state"), which makes the work reachable for the reviewer: a pushed branch, or a saved draft;
-   - **Code:** open the GitHub pull request into the default branch **as a draft**, with a link to the task, a summary of changes, and the checks run or not run. If a PR for `side-hustle/<task gid>` already exists, reuse it; never open a second one. Record its URL in the `Side hustle state:` comment;
+   - **Code:** open the GitHub pull request into the default branch **as a draft**, with a link to the task, a summary of changes, and the checks run or not run. If a PR for `side-hustle/<task gid>` already exists, reuse it, never opening a second one. If it is no longer a draft (for example after an earlier delivery and a rejection), convert it back to draft. Record its URL in the `Side hustle state:` comment;
    - set `Last heartbeat` to now;
    - move the task to To Review;
    - post the "→ To Review" notice.
