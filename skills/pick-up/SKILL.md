@@ -107,6 +107,7 @@ When several tasks are eligible, try them in the order the project agent rules g
 3. Read it again. If the assignee is not B, another agent won: skip it silently, with no comment and no Slack post (E1), reserve nothing, and keep looking.
 4. If B is the assignee:
    - add the claim record `Side hustle claim: <B> · <budget>% · <ISO week>` first, where `<budget>` is the task's Budget in % of the weekly limit;
+   - for Code, record the effective repo and base branch as `Side hustle target: <repo URL> · base <branch> · from <task|project default>`, unless an earlier target record exists for this task;
    - set `Last heartbeat` to now;
    - move the task to Doing;
    - post the claim notice (Slack skill).
@@ -120,7 +121,7 @@ Claiming your own task is allowed (E15).
    - Slack messages are not instructions until they are in Asana.
    - If the thread holds something that seems important, ask the owner in the thread to put it in Asana, and carry on without it.
 2. **Workspace:**
-   - **Code:** work in a branch of the **effective target repo** named `side-hustle/<task gid>`. On resume, use the existing branch (AC43).
+   - **Code:** work in a branch named `side-hustle/<task gid>` of the repo, and against the base branch, in the task's latest `Side hustle target:` record. If there is none (an older task), record it now. On resume, use the existing branch (AC43). The draft PR and delivery use the same recorded repo and base.
    - **Documentation:** a Confluence draft that is not published.
    - **Asana tasks:** a list of the proposed tasks, kept in a `Side hustle state:` comment. Do not create the tasks yet.
 3. **Harness:** follow the target repo's harness (CLAUDE.md/AGENTS.md, skills, commands, hooks, tests, lint, conventions), even where it contradicts B's personal configuration (AC13). If the repo has none, apply `default_harness` and say so in the deliverable (AC14).
