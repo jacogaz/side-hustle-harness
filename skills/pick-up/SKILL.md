@@ -90,7 +90,7 @@ Compute the pledge figures for the current ISO week:
 Look at tasks in **Open** and **Next** (Next is claimable like Open, AC12). A task is eligible when all of these hold (UC2):
 1. it is unassigned;
 2. it is not flagged "stalled" (comment markers in the template);
-3. every required field is present and valid (template parsing rules);
+3. every required field is present and valid (template parsing rules). For Code, the Target resource is the **effective target repo**: the task's own GitHub URL, or the project default when the task's field is empty or `none` (template, "Project target repository");
 4. its Budget fits in B's pledge left (AC3, AC5); a task that does not fit is skipped, and you keep looking (E8).
 
 When several tasks are eligible, try them in the order the project agent rules give. The current rule 3: highest Priority first (High, Medium, Low, then empty), ties by the oldest task. Without such a rule, the order is free.
@@ -120,7 +120,7 @@ Claiming your own task is allowed (E15).
    - Slack messages are not instructions until they are in Asana.
    - If the thread holds something that seems important, ask the owner in the thread to put it in Asana, and carry on without it.
 2. **Workspace:**
-   - **Code:** work in a branch of the target GitHub repo named `side-hustle/<task gid>`. On resume, use the existing branch (AC43).
+   - **Code:** work in a branch of the **effective target repo** named `side-hustle/<task gid>`. On resume, use the existing branch (AC43).
    - **Documentation:** a Confluence draft that is not published.
    - **Asana tasks:** a list of the proposed tasks, kept in a `Side hustle state:` comment. Do not create the tasks yet.
 3. **Harness:** follow the target repo's harness (CLAUDE.md/AGENTS.md, skills, commands, hooks, tests, lint, conventions), even where it contradicts B's personal configuration (AC13). If the repo has none, apply `default_harness` and say so in the deliverable (AC14).
@@ -192,6 +192,6 @@ Do this before every hand-off: To Review, Needs Info, and a release by the worki
    - **Documentation:** save the Confluence draft, still unpublished.
    - **Asana tasks:** the proposed tasks are kept in the state comment.
 2. **Add a `Side hustle state:` comment** with:
-   - the exact location: branch and last commit, or draft link, or the proposed tasks;
+   - the exact location: branch and last commit, or draft link, or the proposed tasks. For Code, also the repo used and whether it came from the task or the project default;
    - what is done;
    - what is left.

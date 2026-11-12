@@ -45,6 +45,7 @@ That's all.
 ## Code tasks and pull requests
 
 For a Code task:
+- **Target repo:** the default is the repo in the `## Target repository` section of the Side Hustle Asana project description (now `https://github.com/AeiltAbraham/complianz-gdpr`, default branch `master`). create-task proposes it. A task with an empty Target resource uses it. An explicit GitHub URL in the task always wins.
 - **At To Review:** the picker pushes `side-hustle/<task id>` and opens a **draft** pull request into the default branch, with the task link, a summary and the checks run or not run.
 - **Review:** the reviewer reviews that PR's diff and keeps its report in Asana.
 - **Fixes** go to the same PR; there is never a second one.

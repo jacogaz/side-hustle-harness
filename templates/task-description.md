@@ -50,7 +50,7 @@ The option gids for Priority and Estimate are in `config/global.yaml`.
 |---|---|---|
 | Goal | Yes | Non-empty text. |
 | Deliverable type | Yes | Exactly one of `Code`, `Documentation`, `Asana tasks`. |
-| Target resource | Yes | One link, matching the deliverable type: a GitHub repo URL (`https://github.com/<owner>/<repo>`) for Code, a Confluence space for Documentation, an Asana project for Asana tasks. |
+| Target resource | Yes | One link, matching the deliverable type: a GitHub repo URL (`https://github.com/<owner>/<repo>`) for Code, a Confluence space for Documentation, an Asana project for Asana tasks. For **Code** only, an empty value or `none` means "use the project's default target repository" (see "Project target repository"). The field then counts as present, but only if the project has a valid default. An explicit valid GitHub URL in the task always wins. |
 | Acceptance criteria | Yes | At least one `- ` list item; each item is verifiable. |
 | Out of scope / do not touch | Yes | At least one `- ` list item. Write `- nothing beyond the acceptance criteria` if the owner names nothing specific. |
 | Context / links | No | Free text, or `none`. |
@@ -89,6 +89,17 @@ The Side Hustle Asana project (`asana_project.gid`) holds agent rules in its **d
   The rules never override SPEC.md limits: non-destructive, no deploy, only the owner moves a task to Done, and Asana as the source of instructions.
 - **Missing or unreadable:** if the section is missing or cannot be read, continue with the default harness and say so once in the session.
 - **Not task instructions:** the rules are how agents work. Task instructions still come only from the task itself.
+
+## Project target repository (for every skill)
+
+The same project description may have a section `## Target repository`. Every skill reads it together with `## Agent rules`, with the same reading rules: from the heading to the next `## ` line or the end, at the start of every run.
+- **Default repo:** the first `https://github.com/<owner>/<repo>` URL in the section is the default target repo for Code tasks.
+- **Default branch:** a default branch named there (for example "default branch master") is used. Otherwise, use the repo's default branch on GitHub.
+- **Effective target repo of a Code task:**
+  - the task's own Target resource, when it is a valid GitHub URL;
+  - otherwise, when it is empty or `none`, the project default;
+  - with neither, the field is missing (Needs Info, E2).
+- **Missing section:** if the section is missing, unreadable or has no valid GitHub URL, there is no default. Say so once in the session.
 
 ## Comment markers (for every skill)
 

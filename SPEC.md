@@ -84,7 +84,7 @@ A **week** is the calendar week (ISO week, Monday to Sunday), the same for the w
 |---|---|---|
 | Goal | Yes | What needs to be achieved. |
 | Deliverable type | Yes | Code / Documentation / Asana tasks. |
-| Target resource | Yes | GitHub repo, Confluence space or Asana project. |
+| Target resource | Yes | GitHub repo, Confluence space or Asana project. For Code, if it is left empty, the default repository named in the Side Hustle Asana project description is used. |
 | Acceptance criteria | Yes | Verifiable list. |
 | Out of scope / do not touch | Yes | What must not be modified. |
 | Context / links | No | Specs, pull requests, threads. |
