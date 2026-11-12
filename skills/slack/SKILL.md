@@ -61,9 +61,9 @@ Add what each case requires:
 |---|---|
 | Claim: Open/Next → Doing (AC10) | `Claimed by @<B>`. Post only after confirming in Asana that you are the assignee. If another agent won the claim, post nothing (E1, AC11). |
 | → Needs Info (AC9, E2, E3, E7, AC18, AC25, AC26) | Mention the owner, `@<owner>`, and say in one line what is missing or which decision is needed. Point to the Asana comment that holds the details. |
-| → To Review | The implementation is finished and review has started. |
+| → To Review | The implementation is finished and review has started. For Code, include the draft pull request link. |
 | To Review → Doing | The reviewer's report is in Asana; attempt `<n>` of `max_reviewer_attempts`. |
-| To Review → QA Review (AC31) | Mention the owner, `@<owner>`. Include a short summary of the deliverable and the links: pull request, Confluence page, or the created Asana tasks. Also link the task. |
+| To Review → QA Review (AC31) | Mention the owner, `@<owner>`. Include a short summary of the deliverable and the links: pull request (now ready for review), Confluence page, or the created Asana tasks. Also link the task. |
 | → Next, release (AC20, AC41, AC42, E6) | Why it was released (voluntary, pledge used up with the `release` policy, or orphaned). Include a link to the Asana comment that documents the state. The task is now unassigned and open to anyone. |
 | Needs Info → Next, stalled (AC38) | Mention the owner, `@<owner>`. The task is flagged "stalled" and cannot be claimed until the owner completes the information in Asana. |
 | Needs Info → Open | The information is complete in Asana and the task is ready to be picked up. |

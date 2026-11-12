@@ -42,6 +42,16 @@ That's all.
 - **To stop:** close the session. Your tasks are then recovered by the heartbeat timeout. Run `/side-hustle:start` again to start a fresh cycle.
 - **Known PoC limitation:** if you close a session and run `/side-hustle:start` in a new one within two poll intervals (about 30 minutes), the old cycle still looks alive. Only your pledge is updated, and no cycle is started. The skill tells you when to run it again, which is once the old check-in is stale.
 
+## Code tasks and pull requests
+
+For a Code task:
+- **At To Review:** the picker pushes `side-hustle/<task id>` and opens a **draft** pull request into the default branch, with the task link, a summary and the checks run or not run.
+- **Review:** the reviewer reviews that PR's diff and keeps its report in Asana.
+- **Fixes** go to the same PR; there is never a second one.
+- **On PASS:** the picker marks the PR **ready for review** and moves the task to QA Review.
+- **On a destructive failure or exhausted attempts:** the draft stays open and is linked in Asana.
+- **Merging:** agents never merge. The owner does, after QA Review.
+
 ## Models
 
 To keep cost down, the work is split by model:
