@@ -63,7 +63,7 @@ Give that context only the following.
   - the owner's comments: instructions and clarifications;
   - earlier `Side hustle review:` reports.
 - **The deliverable**, located through the latest `Side hustle state:` comment:
-  - Code: the draft pull request of `side-hustle/<task gid>` in the target GitHub repo (its URL is in the state comment), reviewed as its diff against the base. The report stays in Asana; a link to it may be added on the PR, and no GitHub review is required. Never merge, approve or undraft it;
+  - Code: the draft pull request of `side-hustle/<task gid>` in the repo and against the base branch from the task's `Side hustle target:` record, with the PR URL from the state comment, reviewed as its diff against the base. The report stays in Asana; a link to it may be added on the PR, and no GitHub review is required. Never merge, approve or undraft it;
   - Documentation: the Confluence draft;
   - Asana tasks: the proposed tasks.
 - **The rules to check against:** the project agent rules (the `## Agent rules` section of the project description), the target repo's harness, and `default_harness`, so the context can apply the precedence in check 4. They come from the project and the repo, not from the implementer.

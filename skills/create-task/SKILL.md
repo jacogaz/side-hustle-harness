@@ -28,7 +28,7 @@ Go through the fields of `${CLAUDE_PLUGIN_ROOT}/templates/task-description.md` i
 - **Task name:** a short title for the Asana task. Propose one from the goal and let the owner change it.
 - **Goal** (required).
 - **Deliverable type** (required): `Code`, `Documentation` or `Asana tasks`.
-- **Target resource** (required): a link that matches the deliverable type (a GitHub repo URL `https://github.com/<owner>/<repo>` for Code, a Confluence space or an Asana project).
+- **Target resource** (required): a link that matches the deliverable type (a GitHub repo URL `https://github.com/<owner>/<repo>` for Code, a Confluence space or an Asana project). For Code, propose the project's default target repo (template, "Project target repository") and let the owner change it. Write the chosen URL explicitly in the task.
 - **Acceptance criteria** (required): at least one verifiable item. If an item cannot be checked (for example "make it better"), ask the owner to make it verifiable.
 - **Out of scope / do not touch** (required): at least one item. If the owner names nothing, write `nothing beyond the acceptance criteria` and confirm it with them.
 - **Context / links**, **Priority**, **Estimate** (optional): empty means `none`.

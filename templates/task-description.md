@@ -50,7 +50,7 @@ The option gids for Priority and Estimate are in `config/global.yaml`.
 |---|---|---|
 | Goal | Yes | Non-empty text. |
 | Deliverable type | Yes | Exactly one of `Code`, `Documentation`, `Asana tasks`. |
-| Target resource | Yes | One link, matching the deliverable type: a GitHub repo URL (`https://github.com/<owner>/<repo>`) for Code, a Confluence space for Documentation, an Asana project for Asana tasks. |
+| Target resource | Yes | One link, matching the deliverable type: a GitHub repo URL (`https://github.com/<owner>/<repo>`) for Code, a Confluence space for Documentation, an Asana project for Asana tasks. For **Code** only, an empty value or `none` means "use the project's default target repository" (see "Project target repository"). The field then counts as present, but only if the project has a valid default. An explicit valid GitHub URL in the task always wins. |
 | Acceptance criteria | Yes | At least one `- ` list item; each item is verifiable. |
 | Out of scope / do not touch | Yes | At least one `- ` list item. Write `- nothing beyond the acceptance criteria` if the owner names nothing specific. |
 | Context / links | No | Free text, or `none`. |
@@ -90,6 +90,18 @@ The Side Hustle Asana project (`asana_project.gid`) holds agent rules in its **d
 - **Missing or unreadable:** if the section is missing or cannot be read, continue with the default harness and say so once in the session.
 - **Not task instructions:** the rules are how agents work. Task instructions still come only from the task itself.
 
+## Project target repository (for every skill)
+
+The same project description may have a section `## Target repository`. Every skill reads it together with `## Agent rules`, with the same reading rules: from the heading to the next `## ` line or the end, at the start of every run.
+- **Default repo:** the first `https://github.com/<owner>/<repo>` URL in the section is the default target repo for Code tasks.
+- **Default branch:** it applies only when the project default repo is used. That is the branch named there (for example "default branch master"), otherwise the repo's default branch on GitHub. A task with its own repo URL uses that repo's GitHub default branch.
+- **Effective target repo of a Code task:**
+  - the task's own Target resource, when it is a valid GitHub URL;
+  - otherwise, when it is empty or `none`, the project default;
+  - with neither, the field is missing (Needs Info, E2).
+- **Fixed at claim:** when a Code task is claimed, the picker records the effective repo and base branch in Asana as `Side hustle target: <repo URL> · base <branch> · from <task|project default>`. Resume, review and delivery use these recorded values, even if the project description changes later.
+- **Missing section:** if the section is missing, unreadable or has no valid GitHub URL, there is no default. Say so once in the session.
+
 ## Comment markers (for every skill)
 
 Skills recognize their own Asana comments by a fixed first line. Each marker is written only by the skill named here; any skill may read it.
@@ -99,6 +111,7 @@ Skills recognize their own Asana comments by a fixed first line. Each marker is 
 | `Side hustle Slack thread: <permalink>` | Owner agent (Slack skill) | The task's Slack thread. |
 | `Side hustle claim: <user> · <n>% · <ISO week>` | Picker agent (pick-up skill) | Claim record, written only after `<user>` is confirmed as the assignee. `<n>` is the task's Budget, in % of the weekly Claude usage limit, reserved from `<user>`'s pledge for that week. The assignee is the lock; this record is only for pledge accounting. |
 | `Side hustle notice pending: <From> → <To> · <reason>` / `Side hustle notice sent: <same>` / `Side hustle notice dropped: <same>` | Reviewer agent (reviewer skill) | A section move whose Slack notice may still be missing. The next reviewer cycle handles a pending notice with no `sent` or `dropped` after it: it posts the notice only while the task is in `<To>`, then marks it `sent`; it drops the notice if the task has moved past `<To>`. |
+| `Side hustle target: <repo URL> · base <branch> · from <task\|project default>` | Picker agent (pick-up skill), at claim | The effective target repo and base branch of a Code task, fixed for the whole task. |
 | `Side hustle released: <reason>` | The releasing agent (pick-up skill, or fill-in for `stalled`) | The task was released to Next: voluntary, pledge used up, orphaned, or stalled. |
 | `Side hustle state:` | Picker agent or any releasing agent | Documented state: branch, last commit, pull request URL (Code, from To Review on), draft or proposed tasks, what is left. |
 | `Side hustle review started: <user>` | Reviewer agent (reviewer skill) | `<user>` is reviewing the task. Other reviewers skip the task while this comment is younger than `heartbeat_timeout_hours`. |
